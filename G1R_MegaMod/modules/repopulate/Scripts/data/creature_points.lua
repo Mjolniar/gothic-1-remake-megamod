@@ -2,6 +2,7 @@
 -- Generic creature spawn points: unconditional OnWorldStart / OnChapterRespawn handlers only.
 -- Excluded: named NPCs, humans, orcs (incl. orc dogs), bosses / unique / quest creatures,
 -- event and conditional spawns, Sleeper Temple, Xardas tower, test and dream maps.
+-- Checked against the official G1R ModKit scripts of the game's Feature Update 1 (2026-10-29) for megamod 0.3.6.
 return {
   ["NEF_LURKER_SPAWN_01"] = { c = "NEF_LURKER_SPAWN_01", x = 96088.3, y = -88723.5, z = -5439.3, ch = false, s = { { d = "SpawnAIAgentDefinition_Lurker", r = nil, u = "Lurker", e = false, n = 1 } } },
   ["NEF_LURKER_SPAWN_01_CH2"] = { c = "NEF_LURKER_SPAWN_01_CH2", x = 95947.0, y = -88579.0, z = -5497.9, ch = true, s = { { d = "SpawnAIAgentDefinition_Lurker", r = nil, u = "Lurker", e = false, n = 1 } } },
@@ -9,6 +10,7 @@ return {
   ["NEF_LURKER_SPAWN_02_CH2"] = { c = "NEF_LURKER_SPAWN_02_CH2", x = 95767.8, y = -85266.3, z = -5552.6, ch = true, s = { { d = "SpawnAIAgentDefinition_Lurker", r = nil, u = "Lurker", e = false, n = 1 } } },
   ["NEF_LURKER_SPAWN_03"] = { c = "NEF_LURKER_SPAWN_03", x = 97610.6, y = -84675.4, z = -5445.1, ch = false, s = { { d = "SpawnAIAgentDefinition_Lurker", r = nil, u = "Lurker", e = false, n = 1 } } },
   ["NEF_SNAPPER_SPAWN_01"] = { c = "NEF_SNAPPER_SPAWN_01", x = 89885.0, y = -89998.7, z = -5362.1, ch = false, s = { { d = "SpawnAIAgentDefinition_Snapper", r = nil, u = "Snapper", e = false, n = 2 } } },
+  ["NEF_SNAPPER_SPAWN_01_CH2"] = { c = "NEF_SNAPPER_SPAWN_01_CH2", x = 89866.1, y = -90156.8, z = -5369.0, ch = true, s = { { d = "SpawnAIAgentDefinition_Snapper", r = nil, u = "Snapper", e = false, n = 1 } } },
   ["OC_MEATBUG_SPAWN_02"] = { c = "OC_MEATBUG_SPAWN_02", x = 107954.1, y = -95603.7, z = -4785.0, ch = false, s = { { d = "SpawnAIAgentDefinition_Meatbug", r = nil, u = "Meatbug", e = false, n = 2 } } },
   ["OC_MEATBUG_SPAWN_03"] = { c = "OC_MEATBUG_SPAWN_03", x = 112251.9, y = -102027.2, z = -4982.0, ch = false, s = { { d = "SpawnAIAgentDefinition_Meatbug", r = nil, u = "Meatbug", e = false, n = 5 } } },
   ["OC_MEATBUG_SPAWN_1"] = { c = "OC_MEATBUG_SPAWN_1", x = 106370.1, y = -103077.7, z = -5358.4, ch = false, s = { { d = "SpawnAIAgentDefinition_Meatbug", r = nil, u = "Meatbug", e = false, n = 3 } } },

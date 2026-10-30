@@ -95,7 +95,7 @@ Recommended (ask the player before installing anything):
    Expected now: `ALL PASSED: 22 suite(s), 6770 check(s) ok, 0 failed`, lint `149 files 0 errors`
    (repopulate 675, repopulate_engine 773, mount 83, repopulate_util 149, loader 561, markers 750, tools 140).
    Steps 1-3 done 2026-10-05 21:21 with exactly these totals. Since 0.3.0 (2026-10-06): `27 suite(s), 7314 check(s)`,
-   lint `186 files 0 errors`; 0.3.5: `27 suite(s), 7470 check(s)`, lint `187 files 0 errors`.
+   lint `186 files 0 errors`; 0.3.6: `27 suite(s), 7478 check(s)`, lint `188 files 0 errors`.
 4. The clone: the same way, from a path without spaces or apostrophes - if its path has either, a junction like
    `cmd /c mklink /J C:\g1r-repo "<home>\Documents\GitHub\G1R_MegaMod"`, then
    `wsl -d Ubuntu -u root -- python3 /mnt/c/g1r-repo/G1R_MegaMod/dev/run_tests.py` (absolute path, as above).

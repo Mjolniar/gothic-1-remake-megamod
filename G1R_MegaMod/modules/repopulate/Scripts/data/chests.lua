@@ -1,6 +1,7 @@
 -- Generated from InteractiveObjects/ChestsLibrary (GORE decompile): container definition -> default contents.
 -- s: settlement (Old/New/Swamp Camp, Bandit Camp, Old/Free Mine) | k: chest or loot (corpses, bags).
 -- Quest, unique, key and map items are removed from the lists.
+-- Checked against the official G1R ModKit scripts of the game's Feature Update 1 (2026-10-29) for megamod 0.3.6.
 return {
   ["IO_AMR_CHEST_01"] = { s = false, k = "chest", i = { { "ItAr_Scroll_TransformMeatbug", 1 }, { "ItMi_Inscription_Parchment", 4 }, { "ItKe_Lockpick", 2 }, { "ItAm_Arrow", 7 }, { "ItMi_Oldcoin_01", 16 } } },
   ["IO_AMR_CHEST_02"] = { s = false, k = "chest", i = { { "ItAr_Scroll_TransformSnapper", 1 }, { "ItKe_Lockpick", 1 }, { "ItAm_Arrow", 9 }, { "ItMi_Orenugget", 11 } } },
@@ -42,9 +43,9 @@ return {
   ["IO_BT_CHEST_01"] = { s = false, k = "chest", i = { { "ItMw_1H_Sword_01", 1 }, { "ItAr_Scroll_FireBolt", 1 }, { "ItMi_Inscription_Parchment", 3 }, { "ItKe_Lockpick", 1 }, { "ItAm_Arrow", 7 }, { "ItMi_Orenugget", 16 } } },
   ["IO_BT_CHEST_02"] = { s = false, k = "chest", i = { { "ItFo_Potion_Strength_01", 1 }, { "ItMi_Smith_Iron", 4 }, { "ItMi_Alchemy_Flask", 2 }, { "ItMi_Alchemy_Salt_01", 2 }, { "ItMi_Oldcoin_01", 9 } } },
   ["IO_BT_CHEST_03"] = { s = false, k = "chest", i = { { "ItKe_Lockpick", 1 }, { "ItFo_Potion_Beer", 4 }, { "ItFo_Mutton_02", 4 }, { "ItMw_1H_Torch", 1 } } },
-  ["IO_CR_CHEST_01"] = { s = false, k = "chest", i = { { "ItFo_Potion_Strength_03", 1 }, { "ItMi_Smith_Ironwood", 1 }, { "ItFo_Potion_Mana_01", 1 }, { "ItKe_Lockpick", 5 } } },
-  ["IO_CR_CHEST_02"] = { s = false, k = "chest", i = { { "ItRw_Crossbow_02", 1 }, { "ItAt_Harpy_01", 5 }, { "ItAm_Bolt", 7 }, { "ItMi_Orenugget", 8 } } },
-  ["IO_CR_CHEST_03"] = { s = false, k = "chest", i = { { "ItAr_Scroll_TransformMeatbug", 1 }, { "ItFo_Potion_Strength_01", 1 }, { "ItFo_Potion_Mana_02", 1 }, { "ItMi_Smith_Oak", 3 }, { "ItMi_Oldcoin_01", 20 } } },
+  ["IO_CR_CHEST_01"] = { s = false, k = "chest", i = { { "ItFo_Potion_Strength_03", 1 }, { "ItAm_Bolt", 8 }, { "ItAt_Harpy_01", 5 } } },
+  ["IO_CR_CHEST_02"] = { s = false, k = "chest", i = { { "ItRw_Crossbow_02", 1 }, { "ItMi_Smith_Ironwood", 1 }, { "ItMi_Smith_Oak", 3 }, { "ItKe_Lockpick", 5 } } },
+  ["IO_CR_CHEST_03"] = { s = false, k = "chest", i = { { "ItAr_Scroll_TransformMeatbug", 1 }, { "ItFo_Potion_Strength_01", 1 }, { "ItFo_Potion_Mana_02", 1 }, { "ItMi_Orenugget", 8 }, { "ItMi_Oldcoin_01", 20 } } },
   ["IO_CV_CHEST_01"] = { s = false, k = "chest", i = { { "ItKe_Lockpick", 1 }, { "ItFo_Potion_Beer", 2 }, { "ItFo_Mutton_01", 6 }, { "ItMw_1H_Torch", 1 }, { "ItMi_Orenugget", 13 } } },
   ["IO_CV_CHEST_02"] = { s = false, k = "chest", i = { { "ItKe_Lockpick", 3 }, { "ItFo_Potion_Beer", 2 }, { "ItMw_1H_Torch", 2 }, { "ItAm_Arrow", 10 } } },
   ["IO_CV_CHEST_03"] = { s = false, k = "chest", i = { { "ItAt_Shadow_01", 1 }, { "ItKe_Lockpick", 2 }, { "ItFo_Potion_Beer", 2 }, { "ItMw_1H_Torch", 1 } } },

@@ -1,6 +1,28 @@
 G1R_MegaMod - changes
 =====================
 
+0.3.6 (2026-10-30)
+  For the game's Feature Update 1 (2026-10-29). Alkimia published the
+  game's scripts with its official ModKit; the mod's data and names were
+  checked against them (dev/tools/modkit_check.py, research/
+  feature-update-1.md):
+  magic 1.0.2: the price of a magic circle is called m_SPCost in the new
+  version (SPCost before): "Own prices for the magic circles" sets it
+  under the new name, and under the old one in older versions of the game.
+  repopulate 1.5.1: three crypt chests (IO_CR_CHEST_01-03) restock what
+  the game puts in them now; 12 new item spots are refilled like the
+  others; a weapon spot of the Sleeper Temple that now only fills after
+  an event is left to the game; one new chapter 2 snapper spawn point.
+  The profile id is also read through the game's GetCurrentProfileId
+  (melee 1.0.1 too), and keys 1.1.1 finds the player's main widget also
+  through GetPlayerWidget - in case the new version renamed the fields
+  read so far (not known until a session shows it).
+  locks: the lock table names the Cutter chest's lock as the new scripts
+  spell it (the lookup ignores capital letters, so nothing changes).
+  Not changed and checked: spell numbers, mining numbers, swimming and
+  speed factors, the effects the timers show, the lock layouts, the NPCs
+  of the map pins.
+
 0.3.5 (2026-10-06)
   Settings texts (asked for: "clean up all explanations in the settings
   app to be shorter and more concise ... eliminate descriptions where

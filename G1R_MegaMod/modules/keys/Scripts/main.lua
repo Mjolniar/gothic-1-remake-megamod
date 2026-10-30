@@ -17,7 +17,7 @@
 -- app and the in-game mod menu change them while the game runs.
 -- ============================================================================
 
-local VERSION = "1.1.0"
+local VERSION = "1.1.1"
 local TAG = "G1R_Keys"
 
 local KIT, SETTINGS, MODS = G1R_KIT, G1R_SETTINGS, G1R_MODS
@@ -234,12 +234,17 @@ end
 local function pauseMenuOpen()
     local ctrl = KIT.controller()
     if not ctrl then return false end
-    local main = KIT.get(ctrl, PLAYER_WIDGET)
+    local main, way = KIT.get(ctrl, PLAYER_WIDGET), ""
+    if not KIT.valid(main) then
+        -- the controller's function for it (the game's scripting reference of Feature Update 1, 2026-10-29, names
+        -- only the function)
+        main, way = KIT.call(ctrl, "GetPlayerWidget"), " (GetPlayerWidget)"
+    end
     if not KIT.valid(main) then
         note("keys.player_widget", "not found", KIT.classToken(ctrl))
         return false
     end
-    note("keys.player_widget", "found", KIT.classToken(main))
+    note("keys.player_widget", "found", KIT.classToken(main) .. way)
     local stack = KIT.get(main, PAUSE_STACK)
     if not KIT.valid(stack) then
         note("keys.pause_stack", "not found", KIT.classToken(main))

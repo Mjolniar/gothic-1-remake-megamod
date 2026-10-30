@@ -149,7 +149,7 @@ section("load")
 do
     local c = boot("load")
     check(c.ok, "the module loads (" .. tostring(c.err) .. ")")
-    check(printed(c.ue, "[G1R_Keys] v1.1.0 loaded: " .. LOADED) ~= nil, "load line: " .. tostring(printed(c.ue, "loaded:")))
+    check(printed(c.ue, "[G1R_Keys] v1.1.1 loaded: " .. LOADED) ~= nil, "load line: " .. tostring(printed(c.ue, "loaded:")))
     check(c.ue.console.keys ~= nil and c.ue.console.g1r_keys ~= nil, "console words keys / g1r_keys registered")
     check(#c.ue.loops == 3 and c.ue.loops[3].ms == 250, "its loop (four times a second), the kit's loop for keys (its key is bound) and the loader's")
     local page = T.menuPage(c, "Key list")
@@ -233,7 +233,7 @@ do
     press(c, "F3")
     check(T.has(box(c), "G - torch: tap to draw or put away, hold to drop") and c.hook.state.shows == 3, "a mod's settings file is read each time the list comes up")
     press(c, "F3")
-    check(status(c) == "v1.1.0 | " .. LOADED .. " | the list came up 3 time(s); the pause menu was seen open 4 time(s)", "status: " .. status(c))
+    check(status(c) == "v1.1.1 | " .. LOADED .. " | the list came up 3 time(s); the pause menu was seen open 4 time(s)", "status: " .. status(c))
     -- a map load
     c.world.open(true)
     press(c, "F3")
@@ -253,6 +253,15 @@ do
     c.world.open(true)
     c.seconds(2)
     check(box(c) == nil and c.fake.value("keys.player_widget") == "not found" and c.fake.detail("keys.player_widget") == "GothicPlayerControllerBaseBP_C", "no main widget: noted, no line")
+    stop(c)
+    -- no property m_Widget, but the controller's function for the main widget (the game's Feature Update 1 names only that)
+    c = boot("mainfunction", { noMainWidget = true })
+    local main = c.world.main
+    c.world.controller.GetPlayerWidget = function() return main end
+    c.world.open(true)
+    c.seconds(2)
+    check(box(c) ~= nil and c.fake.value("keys.player_widget") == "found" and c.fake.detail("keys.player_widget") == "W_Player_C (GetPlayerWidget)",
+        "no property m_Widget: the main widget through GetPlayerWidget, the line is shown, the note says which way (" .. tostring(c.fake.detail("keys.player_widget")) .. ")")
     stop(c)
     c = boot("nostack", { noStack = true })
     c.world.open(true)
@@ -473,7 +482,7 @@ do
     c.ticks(2)
     check(box(c) == nil and c.kit.panel("keys").available() == false and printedCount(c.ue, 'the box "keys" is not available (not found: /Script/UMG.Border)') == 1,
         "the box cannot be built: said once by the kit")
-    check(status(c) == "v1.1.0 | " .. LOADED .. " | the list came up 0 time(s); the pause menu was seen open 1 time(s) | the box cannot be shown in this run",
+    check(status(c) == "v1.1.1 | " .. LOADED .. " | the list came up 0 time(s); the pause menu was seen open 1 time(s) | the box cannot be shown in this run",
         "status says so: " .. status(c))
     local texts = c.ui.count("SetText")
     press(c, "F3")
@@ -510,7 +519,7 @@ do
     local c = boot("console")
     c.kit.bindKey("wait.1", "Y", function() end)
     c.kit.describeKey("wait.1", "wait 30 minutes")
-    check(c.ue:fireConsole("keys") == true and c.ue.device.lines[1] == "[G1R_Keys] v1.1.0 | " .. LOADED
+    check(c.ue:fireConsole("keys") == true and c.ue.device.lines[1] == "[G1R_Keys] v1.1.1 | " .. LOADED
         and c.ue.device.lines[3] == "[G1R_Keys] F3 - show or hide this list" and c.ue.device.lines[4] == "[G1R_Keys] Y - wait 30 minutes", "console: the status and the list")
     local handler = c.ue.console.keys[1]
     local before = #c.ue.printed
@@ -518,12 +527,12 @@ do
     before = #c.ue.printed
     check(handler("keys reload", nil, nil) == true and T.has(c.ue.printed[before + 1], "settings read: "), "no parameters: the words of the whole line")
     before = #c.ue.printed
-    check(handler("keys", nil, nil) == true and T.has(c.ue.printed[before + 1], "[G1R_Keys] v1.1.0 | "), "no parameters, no word: the status")
-    check(#c.fake.versions == 1 and c.fake.versions[1] == "1.1.0" and #c.fake.status == 1 and #c.fake.dump == 1, "version, status and dump handed to the diagnostics")
+    check(handler("keys", nil, nil) == true and T.has(c.ue.printed[before + 1], "[G1R_Keys] v1.1.1 | "), "no parameters, no word: the status")
+    check(#c.fake.versions == 1 and c.fake.versions[1] == "1.1.1" and #c.fake.status == 1 and #c.fake.dump == 1, "version, status and dump handed to the diagnostics")
     c.world.open(true)
     c.ticks(1)
     local d = c.fake.dump[1]()
-    check(d.version == "1.1.0" and d.shown == true and d.showing == "line" and d.shows == 0 and d.menus == 1 and d.box == true and d.class == true and d.key == "F3"
+    check(d.version == "1.1.1" and d.shown == true and d.showing == "line" and d.shows == 0 and d.menus == 1 and d.box == true and d.class == true and d.key == "F3"
         and d.size == 10 and d.lines[1] == LINE, "the dump: what is on, what happened, the lines")
     press(c, "F3")
     d = c.fake.dump[1]()

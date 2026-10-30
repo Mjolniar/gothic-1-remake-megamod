@@ -232,7 +232,8 @@ local function build(ue, world, options)
     for _, s in ipairs(Game.skills) do
         local live = { name = s.name, cost = s.cost }
         data.skills[s.name] = live
-        object(s.name, without(s.name, { SPCost = plain(live, "cost", true) }))
+        -- the price: m_SPCost since the game's Feature Update 1 (2026-10-29), SPCost before (options.oldCost)
+        object(s.name, without(s.name, { [options.oldCost and "SPCost" or "m_SPCost"] = plain(live, "cost", true) }))
     end
 
     -- ------------------------------------------------------------------ the game's side
@@ -258,7 +259,7 @@ local function build(ue, world, options)
     -- GA_Spell_Heal.as 145: the amount of the caster's circle from the config's map (1 = untrained ... 8 = sixth)
     function world.heal(index) return data.configs.HealSpellConfig.heal[index].value end
     -- LearnSkill / HasEnoughSkillpointsToLearnSkill (GASCharacterStateMixins.as 972-1003): the skill class's
-    -- default object's SPCost at the moment of learning. n = 0 for the basics, 1-6 for the circles.
+    -- default object's price (m_SPCost, through GetSPCost) at the moment of learning. n = 0 for the basics, 1-6 for the circles.
     function world.price(n) return data.skills["GE_Skill_Mage_Circle_" .. (n == 0 and "Amateur" or n)].cost end
     -- UGE_Ex_Damage.ApplyStack (Damage.as 603-628) with UGE_IceStack (limit 50): the hit sets the counter to the
     -- limit when its damage reaches the limit or the entry forces it, else to floor(damage - 1); one more stack
@@ -401,7 +402,7 @@ do
     local c = start("load")
     local ue, w = c.ue, c.world
     check(c.ok, "the module loads (" .. tostring(c.err) .. ")")
-    check(#ue.printed == 1 and ue.printed[1] == "[G1R_Magic] v1.0.1 loaded: everything as the game has it (the game is not touched)\n",
+    check(#ue.printed == 1 and ue.printed[1] == "[G1R_Magic] v1.0.2 loaded: everything as the game has it (the game is not touched)\n",
         "one load line: " .. tostring(ue.printed[1]):gsub("\n", ""))
     check(#ue.loops == 2 and ue.loops[2].ms == 250 and math.type(ue.loops[2].ms) == "integer", "one game-thread loop of its own, every 250 ms")
     check(ue.console.magic ~= nil and ue.console.g1r_magic ~= nil and #ue.loadMapPre == 1 and #ue.loadMapPost == 1 and (ue.calls.RegisterHook or 0) == 0,
@@ -410,7 +411,7 @@ do
     check(#ue.lookups == 0 and allOf(ue) == 0 and (ue.calls.FindFirstOf or 0) == 0, "a minute of play with the shipped settings: nothing is searched")
     check(w.reads == 0 and w.writes == 0 and w.walks == 0 and w.untouched() and #ue.errors == 0, "nothing is read, nothing is written, the game is untouched")
     local lines = c.hook.status()
-    check(#lines == 2 and lines[1] == "v1.0.1 | everything as the game has it (the game is not touched)"
+    check(#lines == 2 and lines[1] == "v1.0.2 | everything as the game has it (the game is not touched)"
         and lines[2] == "nothing is changed: the game's own numbers are in place and the game is not looked at", "the status says so, in two lines")
     check(T.read(c.path) == shipped, "the settings file is left as it is")
     local v = c.hook.settings.values
@@ -431,7 +432,7 @@ section("2. damage of every spell: the definitions are searched a few per look, 
 do
     local c = start("damage", { config = cfg({ "Config.Damage = 1.5" }), diag = true })
     local ue, w = c.ue, c.world
-    check(printed(ue, "[G1R_Magic] v1.0.1 loaded: damage x1.5\n") ~= nil, "the load line names the multiplier")
+    check(printed(ue, "[G1R_Magic] v1.0.2 loaded: damage x1.5\n") ~= nil, "the load line names the multiplier")
     check(#ue.lookups == 0 and w.reads == 0, "loading itself searches and reads nothing")
     c.ticks(1)
     check(#ue.lookups == 4 and ue.lookups[1] == PATH .. "FireBoltProjectileDefinition" and w.damage("FireBoltProjectileDefinition", 0) == 52.5
@@ -1457,11 +1458,11 @@ do
     stop(c)
     -- something else answers to the path
     c = start("absent-other", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost1 = 3" }), prepare = function(ue2, world)
-        world.stranger = ue2:object("GE_Skill_Mage_Circle_1 /Script/Angelscript.Default__GE_Skill_Mage_Circle_10", { SPCost = 77 })
+        world.stranger = ue2:object("GE_Skill_Mage_Circle_1 /Script/Angelscript.Default__GE_Skill_Mage_Circle_10", { m_SPCost = 77 })
         ue2.objects[PATH .. "GE_Skill_Mage_Circle_1"] = world.stranger
     end })
     c.settle()
-    check(rawget(c.world.stranger, "SPCost") == 77 and c.world.price(1) == 10 and printed(c.ue, "not found in this game: GE_Skill_Mage_Circle_1 - ") ~= nil,
+    check(rawget(c.world.stranger, "m_SPCost") == 77 and c.world.price(1) == 10 and printed(c.ue, "not found in this game: GE_Skill_Mage_Circle_1 - ") ~= nil,
         "an object whose name is not the one asked for is not taken")
     stop(c)
 
@@ -1483,7 +1484,7 @@ do
     stop(c)
     c = start("lacking-more", { config = cfg({ "Config.ManaCost = 2.0", "Config.Range = 2.0", "Config.HealAmount = 2.0", "Config.IceBlockFreeze = true", "Config.IceWaveFreeze = true",
         "Config.CircleCosts = true", "Config.CircleCost1 = 3" }), game = { lacking = { IceBlockSpellConfig = { "m_SpellLevels" }, HealSpellConfig = { "m_healAmountByMagicCircle", "m_AreaRange" },
-        GE_IceBlock_Freeze_Damage = { "m_ElementalEffectStacks" }, GE_Skill_Mage_Circle_1 = { "SPCost" } } }, diag = true,
+        GE_IceBlock_Freeze_Damage = { "m_ElementalEffectStacks" }, GE_Skill_Mage_Circle_1 = { "m_SPCost" } } }, diag = true,
         prepare = function(_, world)
             world.data.effects.GE_IceWave_Freeze_Damage.stacks[1] = nil                         -- an effect without an ice counter
             world.data.configs.StormFistSpellConfig.levels[1] = nil                             -- a config without a level
@@ -1493,7 +1494,7 @@ do
     c.settle()
     local line = printed(ue, "not there in this game: ") or ""
     check(has(line, "IceBlockSpellConfig.m_SpellLevels") and has(line, "HealSpellConfig.m_AreaRange") and has(line, "HealSpellConfig.m_healAmountByMagicCircle")
-        and has(line, "GE_IceBlock_Freeze_Damage.m_ElementalEffectStacks") and has(line, "GE_IceWave_Freeze_Damage.m_ElementalEffectStacks") and has(line, "GE_Skill_Mage_Circle_1.SPCost")
+        and has(line, "GE_IceBlock_Freeze_Damage.m_ElementalEffectStacks") and has(line, "GE_IceWave_Freeze_Damage.m_ElementalEffectStacks") and has(line, "GE_Skill_Mage_Circle_1.m_SPCost")
         and has(line, "StormFistSpellConfig.m_SpellLevels") and has(line, "FireRainSpellConfig.CastManaCost"),
         "a config without levels, without reach, without the heal map; an effect without its list or with an empty one; a skill without price; a level without its mana: all named")
     check(w.range("SleepSpellConfig") == 3000 and w.mana("HealSpellConfig") == 4 and w.range("HealSpellConfig") == 1500 and w.heal(1) == 4 and w.price(1) == 10 and w.price(2) == 15 and not w.freezes("GE_IceBlock_Freeze_Damage", 1)
@@ -1505,11 +1506,24 @@ do
     check(#ue.errors == 0 and w.indexed == 0, "no error, and no list was indexed")
     stop(c)
 
-    c = start("lacking-one", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost2 = 12" }), game = { lacking = { GE_Skill_Mage_Circle_1 = { "SPCost" } } }, diag = true })
+    c = start("lacking-one", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost2 = 12" }), game = { lacking = { GE_Skill_Mage_Circle_1 = { "m_SPCost" } } }, diag = true })
     c.settle()
-    check(c.fake.value("magic.properties") == "1 not there" and c.fake.detail("magic.properties") == "GE_Skill_Mage_Circle_1.SPCost"
-        and has(status(c), "|not there in this game: GE_Skill_Mage_Circle_1.SPCost") and c.world.price(2) == 12 and c.fake.detail("magic.objects") == nil,
+    check(c.fake.value("magic.properties") == "1 not there" and c.fake.detail("magic.properties") == "GE_Skill_Mage_Circle_1.m_SPCost"
+        and has(status(c), "|not there in this game: GE_Skill_Mage_Circle_1.m_SPCost") and c.world.price(2) == 12 and c.fake.detail("magic.objects") == nil,
         "a single property that is not there: named in the diagnostics and the status too")
+    -- the price under its name of before Feature Update 1 (SPCost): read and written under that name
+    stop(c)
+    c = start("old-cost", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost1 = 3", "Config.CircleCost6 = 20" }), game = { oldCost = true }, diag = true })
+    c.settle()
+    check(c.world.price(1) == 3 and c.world.price(6) == 20 and c.world.price(2) == 15 and c.fake.value("magic.properties") == "all there"
+        and (c.world.read["GE_Skill_Mage_Circle_1.SPCost"] or 0) > 0,
+        "a game of before Feature Update 1 (the price is SPCost): the prices are set through SPCost, nothing is lacking")
+    -- neither name: the newer one is named as not there
+    stop(c)
+    c = start("no-cost", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost3 = 4" }), game = { lacking = { GE_Skill_Mage_Circle_3 = { "m_SPCost" } } }, diag = true })
+    c.settle()
+    check(c.fake.detail("magic.properties") == "GE_Skill_Mage_Circle_3.m_SPCost" and c.world.price(3) == 20 and c.world.price(1) == 10,
+        "an object with neither name of the price: named as not there (by the newer name), the game's price stays")
     stop(c)
     c = start("empty", { config = cfg({ "Config.HealAmount = 2.0" }), diag = true, prepare = function(_, world)
         world.data.configs.HealSpellConfig.heal = {}                        -- a heal map without entries
@@ -1612,7 +1626,7 @@ do
     stop(c)
     -- a write that lands as another value than asked for
     c = start("twisted", { config = cfg({ "Config.CircleCosts = true", "Config.CircleCost2 = 12", "Config.CheckSeconds = 10" }), prepare = function(_, world)
-        world.twist["GE_Skill_Mage_Circle_2.SPCost"] = function(v) return math.floor(v / 5) * 5 end          -- the game keeps prices in fives
+        world.twist["GE_Skill_Mage_Circle_2.m_SPCost"] = function(v) return math.floor(v / 5) * 5 end          -- the game keeps prices in fives
     end })
     ue, w = c.ue, c.world
     c.settle()
@@ -1712,7 +1726,7 @@ do
     local list = {}
     for name in pairs(names) do list[#list + 1] = name end
     table.sort(list)
-    check(banned == 0 and table.concat(list, " ") == "SPCost m_AreaRange m_DamageBase m_DamageMagicCircleProgression m_ElementalEffectStacks m_Speed m_SpellLevels m_SuperArmorDamageBase",
+    check(banned == 0 and table.concat(list, " ") == "m_AreaRange m_DamageBase m_DamageMagicCircleProgression m_ElementalEffectStacks m_SPCost m_Speed m_SpellLevels m_SuperArmorDamageBase",
         "the properties read from the objects in this session (none of the four whose read makes UE4SS write a debug line, rule 2): " .. table.concat(list, " "))
     stop(c)
     c = start("cost-silent", { config = PLAYER:gsub("return Config", "Config.ShowMessage = false\nreturn Config") })
@@ -1775,9 +1789,9 @@ do
     local ue, w = c.ue, c.world
     local before = #ue.printed
     check(ue:fireConsole("magic") == true and #ue.errors == 0, "magic: handled (a boolean is returned)")
-    check(#ue.printed == before + 2 and ue.printed[before + 1] == "[G1R_Magic] v1.0.1 | damage x1.5, 1 ice spell(s) freeze with every hit\n"
+    check(#ue.printed == before + 2 and ue.printed[before + 1] == "[G1R_Magic] v1.0.2 | damage x1.5, 1 ice spell(s) freeze with every hit\n"
         and ue.printed[before + 2] == "[G1R_Magic] nothing is changed right now\n", "before the first look: version, what is set, nothing changed yet")
-    check(#ue.device.lines == 2 and ue.device.lines[1] == "[G1R_Magic] v1.0.1 | damage x1.5, 1 ice spell(s) freeze with every hit", "the same lines go to the console window")
+    check(#ue.device.lines == 2 and ue.device.lines[1] == "[G1R_Magic] v1.0.2 | damage x1.5, 1 ice spell(s) freeze with every hit", "the same lines go to the console window")
     check(w.reads == 0 and #ue.lookups == 0, "the status does not look at the game")
     local early = c.fake.dump[1]()
     check(early.changed_values == 0 and early.changed_objects == 0 and early.failed_writes == 0 and early.looks == 0 and early.searches == 0 and early.at_work == false and next(early.objects) == nil,
@@ -1827,7 +1841,7 @@ do
     before = #ue.printed
     local reads = w.reads
     c.ticks(1)
-    check(#ue.printed == before + 2 + 22 and ue.printed[before + 1] == "[G1R_Magic] v1.0.1 | damage x2\n"
+    check(#ue.printed == before + 2 + 22 and ue.printed[before + 1] == "[G1R_Magic] v1.0.2 | damage x2\n"
         and ue.printed[before + 3] == "[G1R_Magic] FireBoltProjectileDefinition: base1 35 -> 70, step1.1 40 -> 80, step1.2 50 -> 100, step1.3 65 -> 130\n",
         "pressed: the status and the list of changed values go to UE4SS.log")
     check(c.ui.note() == "Magic: 65 value(s) changed in 22 object(s); the list is in UE4SS.log" and w.reads == reads, "a note on screen says where to look; the game is not read for it")
@@ -1850,7 +1864,7 @@ do
     check(originals == 23 and table.concat(others, " ") == "magic.inherited=none magic.steps=as expected magic.write.map=ok magic.write.steps=ok magic.ledger=kept magic.write.flags=ok "
         .. "magic.objects=all found magic.properties=all there magic.others=none magic.applied=66 value(s) in 23 object(s) magic.applied=65 value(s) in 22 object(s)",
         "one note with the game's own numbers for each of the 23 objects; every other note once, and again only when its value changes: " .. table.concat(others, " "))
-    check(c.fake.versions[1] == "1.0.1" and table.concat(c.fake.crumbs, " ; ") == "first look at a definition: FireBoltProjectileDefinition ; first write to a definition: FireBoltProjectileDefinition ; "
+    check(c.fake.versions[1] == "1.0.2" and table.concat(c.fake.crumbs, " ; ") == "first look at a definition: FireBoltProjectileDefinition ; first write to a definition: FireBoltProjectileDefinition ; "
         .. "first look at a hit effect: GE_IceBlock_Freeze_Damage ; first write to a hit effect: GE_IceBlock_Freeze_Damage",
         "the version; the first look at and the first write to an object of each kind are announced before they happen")
     check(c.fake.events[1] == "first look at a definition done: FireBoltProjectileDefinition = base 35, steps 40 50 65, speed 4000, stagger 30"
@@ -1870,7 +1884,7 @@ do
     check(w.reads == reads and #ue.lookups == lookups, "the status and the dump are built from what the module holds: no call into the game")
     local Fake = dofile(HERE .. "../markers/diag_fake.lua")
     local plain, where = Fake.plain(dump)
-    check(plain and (Fake.roundTrip(dump)) and dump.version == "1.0.1" and dump.enabled == true and dump.summary == "damage x2" and dump.changed_values == 65 and dump.changed_objects == 22
+    check(plain and (Fake.roundTrip(dump)) and dump.version == "1.0.2" and dump.enabled == true and dump.summary == "damage x2" and dump.changed_values == 65 and dump.changed_objects == 22
         and dump.by_kind.damage == 65 and dump.failed_writes == 0 and dump.looks == 2 and dump.searches == 23 and dump.at_work == false and dump.whole_mana == true
         and #dump.not_found == 0 and #dump.gone == 0 and #dump.not_there == 0 and #dump.changed_by_others == 0 and #dump.other_shape == 0,
         "the dump is plain data: what the module holds (" .. tostring(where) .. ")")
@@ -1878,7 +1892,7 @@ do
     check(bolt.kind == "definition" and bolt.state == "found" and bolt.shape == "1/3" and bolt.slots.base1.orig == 35 and bolt.slots.base1.ours == 70 and bolt.slots.speed.orig == 4000
         and bolt.slots.speed.ours == nil and block.kind == "effect" and block.slots.force1.orig == false and block.slots.force1.ours == nil and heal == nil,
         "for every object that was searched: its kind, its shape, the game's number and the module's for each place; nothing for objects never searched")
-    check(#statusLines == 2 and statusLines[1] == "v1.0.1 | damage x2" and statusLines[2] == "changed right now: 65 value(s) in 22 object(s) of the game (damage 65)", "the status function gives the status lines")
+    check(#statusLines == 2 and statusLines[1] == "v1.0.2 | damage x2" and statusLines[2] == "changed right now: 65 value(s) in 22 object(s) of the game (damage 65)", "the status function gives the status lines")
     local leaked = {}
     for k in pairs(_G) do
         if not known[k] and not given[k] then leaked[#leaked + 1] = tostring(k) end
@@ -2007,8 +2021,8 @@ do
         and w.freezes("GE_IceBlock_Freeze_Damage", 1) and w.price(6) == 25 and #ue.errors == 0, "the player's configuration reaches the game as without the loader")
     check(ue:fireConsole("g1r diag") == true, "g1r diag handled")
     local report = T.read(c.dir .. "/report-latest.txt") or ""
-    check(has(report, "magic: loaded, version 1.0.1")
-        and has(report, "[magic] v1.0.1 | 24 setting(s) for single spells, 1 ice spell(s) freeze with every hit, own prices for the magic circles")
+    check(has(report, "magic: loaded, version 1.0.2")
+        and has(report, "[magic] v1.0.2 | 24 setting(s) for single spells, 1 ice spell(s) freeze with every hit, own prices for the magic circles")
         and has(report, "[magic] changed right now: 73 value(s) in 33 object(s) of the game (damage 39, mana 14, casting time 9, flight speed 4, stagger 1, freeze 1, circle price 5)"),
         "report: the module's version and its status lines")
     check(has(report, "magic.objects = all found [") and has(report, "magic.properties = all there [") and has(report, "magic.others = none [") and has(report, "magic.inherited = none [")
@@ -2023,7 +2037,7 @@ do
         and has(report, "[magic] registered RegisterConsoleCommandHandler: 2 ok, 0 failed") and has(report, "count: 0 (0 distinct)"),
         "report: the 35 searches (none repeated), the module's loop and its two console commands are counted; no error")
     local log = newest(c, "session-")
-    check(has(log, "[magic] [G1R_Magic] v1.0.1 loaded: 24 setting(s) for single spells") and has(log, "[magic] look 1 (start): 35 object(s), 73 value(s) changed, 0 put back"),
+    check(has(log, "[magic] [G1R_Magic] v1.0.2 loaded: 24 setting(s) for single spells") and has(log, "[magic] look 1 (start): 35 object(s), 73 value(s) changed, 0 put back"),
         "session log: the load line and the first look")
     local at = log:find("[magic] > first write to a definition: FireBoltProjectileDefinition", 1, true)
     check(at ~= nil and log:find("[magic] first write to a definition done: FireBoltProjectileDefinition", at, true) ~= nil
@@ -2034,7 +2048,7 @@ do
     check(okDump and type(dump) == "table" and type(dump.magic) == "table" and dump.magic.changed_values == 73 and dump.magic.changed_objects == 33 and dump.magic.searches == 35
         and dump.magic.objects.FireBoltProjectileDefinition.slots.base1.ours == 30 and dump.magic.objects.GE_Skill_Mage_Circle_6.slots.cost.orig == 40 and dump._meta.refusedCount == 0,
         "dump: what the module holds, nothing refused")
-    check(ue:fireConsole("g1r") == true and printed(ue, "[G1R_MegaMod] magic: loaded, version 1.0.1, 0 error(s), 47 note(s)") ~= nil, "g1r lists the module with its notes")
+    check(ue:fireConsole("g1r") == true and printed(ue, "[G1R_MegaMod] magic: loaded, version 1.0.2, 0 error(s), 47 note(s)") ~= nil, "g1r lists the module with its notes")
     check(ue:fireConsole("magic") == true and printed(ue, "[G1R_Magic] changed right now: 73 value(s) in 33 object(s)") ~= nil, "the module's own console command works through the loader")
     -- settings through the loader: the in-game menu
     local page = c.mods.store["SMM:schema:G1R Combat"]

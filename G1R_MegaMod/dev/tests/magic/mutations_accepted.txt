@@ -6,3 +6,4 @@ drop-return|return "./"|the fall-back folder is only reached when the chunk has 
 le->lt|if abs(v - whole) <= SNAP then return whole end|0.025 has no exact binary form: a product never misses a whole number by exactly that much
 false->true|if not pcall(f, element, index) then good = false end|no step of these walks can raise - every read and write inside is guarded already; the guard is for what the model does not know of UE4SS
 num+1|local cost = floor(orig * times + 0.5 + 1e-9)|the amount only has to lie far above the error of the multiplication (about 1e-13 here) and far below a thousandth of a point: 1e-10 does that as well as 1e-9
+drop-return|return ""|in SCAN.skill after lack(): an object with neither name of the price has no slot, so a shape of nil (the first look repeated) and "" (an empty shape) read and write the same nothing

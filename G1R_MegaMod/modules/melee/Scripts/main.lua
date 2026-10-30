@@ -49,7 +49,7 @@
 -- app and the in-game mod menu change them while the game runs.
 -- ============================================================================
 
-local VERSION = "1.0.0"
+local VERSION = "1.0.1"
 local TAG = "G1R_Melee"
 
 local KIT, SETTINGS = G1R_KIT, G1R_SETTINGS
@@ -257,7 +257,10 @@ local function flowWay()
 end
 -- The profile the game is in, as text ("?" when that cannot be read).
 local function profile()
-    local id = KIT.number(KIT.get(KIT.subsystem("instance", PROFILES, "G1R"), "m_CurrentProfileId"))
+    local profiles = KIT.subsystem("instance", PROFILES, "G1R")
+    local id = KIT.number(KIT.get(profiles, "m_CurrentProfileId"))
+    -- (the game's scripting reference of its Feature Update 1, 2026-10-29, names only the function)
+    if id == nil then id = KIT.number(KIT.call(profiles, "GetCurrentProfileId")) end
     if id == nil then
         note("melee.profile", "not readable")
         return "?"

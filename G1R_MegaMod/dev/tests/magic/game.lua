@@ -15,7 +15,8 @@
 --                                        GA_Spell_UrizielWaveOfDeath.as 82)
 --            GAS/Effects/Damage/Ice/     the three ice hit effects (one entry in m_ElementalEffectStacks, flag false)
 --            GAS/Effects/Debuffs/GE_Damage.as   the entry every hit effect has in m_CommonElementalEffectStacks
---            GAS/Effects/Skills/GE_Skills.as    SPCost of the magic circles
+--            GAS/Effects/Skills/GE_Skills.as    the price of the magic circles (m_SPCost; SPCost before the game's
+--                                               Feature Update 1 of 2026-10-29)
 --   IN-GAME  another author's mod (G1R_MageBalance 0.9.0) found the object and printed numbers it read from it in
 --            the session of 2026-10-01 (UE4SS.log lines 1136-1177). `seen` says what the log shows for the object:
 --            the base damage it read; for the spells it scaled by a factor also the steps (its targets are the

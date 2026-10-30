@@ -47,7 +47,7 @@
 -- app and the in-game mod menu change them while the game runs.
 -- ============================================================================
 
-local VERSION = "1.0.1"
+local VERSION = "1.0.2"
 local TAG = "G1R_Magic"
 
 local KIT, SETTINGS = G1R_KIT, G1R_SETTINGS
@@ -501,8 +501,18 @@ function SCAN.effect(o, visit, lack)
     if not n or n == 0 then lack("m_ElementalEffectStacks") end
     return tostring(n or 0)
 end
+-- The price of a circle (M12): the property m_SPCost since the game's Feature Update 1 (2026-10-29, when the
+-- native class got GetSPCost), SPCost before. Of the two, the first the object has is read and written.
+local SKILL_COST = { "m_SPCost", "SPCost" }
 function SCAN.skill(o, visit, lack)
-    plain(o, "SPCost", "cost", visit, lack)
+    for _, property in ipairs(SKILL_COST) do
+        local v = KIT.number(KIT.get(o, property))
+        if v ~= nil then
+            visit("cost", v, function(x) o[property] = x end)
+            return ""
+        end
+    end
+    lack(SKILL_COST[1])
     return ""
 end
 

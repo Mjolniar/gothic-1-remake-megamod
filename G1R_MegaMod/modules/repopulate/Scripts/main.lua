@@ -37,7 +37,7 @@
 -- also happens when he mounts or dismounts.
 -- ============================================================================
 
-local VERSION = "1.5.0"
+local VERSION = "1.5.1"
 
 -- Diagnostics handle of the megamod loader; nil when the mod runs on its own,
 -- and then nothing behind `if DIAG` runs. It only records what the mod sees.
@@ -130,12 +130,21 @@ local StatePath = nil
 local LastSaveReal = -1e9
 
 local PROFILES = "/Script/G1R.PersistentDataSubsystem"
+-- The id of the profile in use: the subsystem's m_CurrentProfileId (R2), else its function GetCurrentProfileId
+-- (the only one of the two the game's scripting reference of Feature Update 1, 2026-10-29, names).
+local function profileId(pds)
+    local id = U.num(U.get(pds, "m_CurrentProfileId"))
+    if id ~= nil then return id end
+    id = U.num(U.call(pds, "GetCurrentProfileId"))
+    if id ~= nil then U.logOnce("profile_fn", "the profile id is read through GetCurrentProfileId (m_CurrentProfileId is not there)") end
+    return id
+end
 -- The key of the profile the game is in: "profile_<id>". Second result: false
 -- when the id could not be read (the key is then "profile_default").
 local function profileKey()
     local pds, asked = U.subsystem("instance", PROFILES)
     if asked then
-        local id = U.num(U.get(pds, "m_CurrentProfileId"))
+        local id = profileId(pds)
         if id then return "profile_" .. math.floor(id), true end
         return "profile_default", false
     end
@@ -143,7 +152,7 @@ local function profileKey()
     if U.mayWalk() then
         for _, o in ipairs(U.findAll("PersistentDataSubsystem")) do
             if U.valid(o) and not U.isDefault(o) then
-                local id = U.num(U.get(o, "m_CurrentProfileId"))
+                local id = profileId(o)
                 if id then return "profile_" .. math.floor(id), true end
             end
         end
@@ -431,7 +440,7 @@ local function tick()
         -- the profile in use, asked from the engine (never searched for here)
         Session.profileAt = realNow
         local pds, asked = U.subsystem("instance", PROFILES)
-        local id = asked and U.num(U.get(pds, "m_CurrentProfileId")) or nil
+        local id = asked and profileId(pds) or nil
         local key = id and ("profile_" .. math.floor(id)) or nil
         if key and key ~= Session.profile then
             local was = Session.profile

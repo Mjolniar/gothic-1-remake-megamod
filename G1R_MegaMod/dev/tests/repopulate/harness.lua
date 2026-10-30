@@ -946,7 +946,7 @@ check(H.notify["/Script/G1R.InteractiveObjectActor"] ~= nil, "container notifica
 check(H.console and H.console.repop, "console command registered")
 local ld = lastLog("loaded:")
 check(#H.KNAMES == 528, "528 container kinds in the data (" .. #H.KNAMES .. ")")
-check(ld and ld:find("401 creature spawn points %(814 creatures%)") and ld:find("2495 item spots") and ld:find((#H.KNAMES + H.TEST_KINDS) .. " containers"), "load line: data counts (plus the test kinds)")
+check(ld and ld:find("402 creature spawn points %(815 creatures%)") and ld:find("2506 item spots") and ld:find((#H.KNAMES + H.TEST_KINDS) .. " containers"), "load line: data counts (plus the test kinds)")
 
 local function tick(realDt, gameDt)
   H.real = H.real + (realDt or 0.25)
@@ -2634,7 +2634,7 @@ check(errs == 0, "no error lines")
   local seenOk = dk.points_seen == count(T.state.seen) and #(dk.seen or {}) == dk.points_seen
   for _, n in ipairs(dk.seen or {}) do if not T.state.seen[n] then seenOk = false end end
   local cstats, queue, _, farSeen = T.creatures.stats()
-  check(seenOk and dk.points_known == 401 and dk.queue == queue and type(dk.stats) == "table" and dk.stats.spawned == cstats.spawned and dk.stats.cycles == cstats.cycles
+  check(seenOk and dk.points_known == 402 and dk.queue == queue and type(dk.stats) == "table" and dk.stats.spawned == cstats.spawned and dk.stats.cycles == cstats.cycles
     and dk.far_states_visible == farSeen and dk.ids_carry_point_names == true and dk.census_running == false and #(dk.intervals or {}) == 1 and dk.intervals[1].hours == 24,
     ("dump: creature census summary (%s points seen populated, queue %s, numbers, roll intervals)"):format(tostring(dk.points_seen), tostring(dk.queue)))
   local lurker, classRows = nil, #(dk.classes or {}) >= 3
@@ -2673,7 +2673,7 @@ check(errs == 0, "no error lines")
   noted("core.game_time_source", "property")
   times("core.game_time_source", 1, "although the clock is read on every update")
   check(countLogs("spots set refillable") >= 2, "(the world item pass ran " .. countLogs("spots set refillable") .. " times)")
-  noted("items.configs_set", "2495 spots", "0 ms")
+  noted("items.configs_set", "2506 spots", "0 ms")
   times("items.configs_set", 1)
   check(countLogs("creature cycle") >= 2, "(" .. countLogs("creature cycle") .. " creature cycles and an evidence scan)")
   noted("creatures.states_class", "GothicCharacterState", #States)

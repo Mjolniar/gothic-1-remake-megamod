@@ -59,11 +59,13 @@ def read_locks(source):
 
 
 def read_used(source):
+    """Lock name in small letters -> "chest" / "door": the game does not keep capital and small letters of a name
+    apart (a chest of the game names "OC_Chest_Cutter_Lock", the lock calls itself "OC_Chest_CUTTER_Lock")."""
     used = {}
     for kind, path in (("chest", "ChestsLibrary.as"), ("door", "TriggerSpaces.as")):
         text = open(os.path.join(source, "InteractiveObjects", path), encoding="utf-8", errors="replace").read()
         for name in USED.findall(text):
-            used.setdefault(name, kind)
+            used.setdefault(name.lower(), kind)
     return used
 
 
@@ -124,7 +126,7 @@ def main(argv):
         if proven < 0:
             raise SystemExit("%s cannot be opened even as the game has it" % name)
         summary["locks"] += 1
-        summary["used"] += 1 if any(n in used for n in lock["names"]) else 0
+        summary["used"] += 1 if any(n.lower() in used for n in lock["names"]) else 0
         summary["proven_all"] += 1 if proven == count else 0
         cert = []
         for depth in depths_written(count, proven):
@@ -135,7 +137,7 @@ def main(argv):
             summary["names"] += 1
             data.append('    ["%s"] = { %d, %d },' % (each, count, proven))
             tests.append('    { name = "%s", used = %s, p = { %s }, c = { %s },\n      ways = { %s } },' % (
-                each, ('"%s"' % used[each]) if each in used else "false", ", ".join(str(p) for p in lock["pieces"]), flat, ", ".join(cert)))
+                each, ('"%s"' % used[each.lower()]) if each.lower() in used else "false", ", ".join(str(p) for p in lock["pieces"]), flat, ", ".join(cert)))
     data.append("}")
     tests.append("}")
     with open(os.path.join(MOD, "modules", "locks", "Scripts", "lockdata.lua"), "w", newline="\n") as f:

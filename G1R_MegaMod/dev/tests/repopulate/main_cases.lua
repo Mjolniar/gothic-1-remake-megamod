@@ -288,6 +288,16 @@ do
   os.remove(STATE .. "profile_default.lua")
 end
 do
+  -- no property m_CurrentProfileId, but the subsystem's function for it (the game's Feature Update 1 names only that)
+  local T = start(function() PDS.m_CurrentProfileId = nil; PDS.GetCurrentProfileId = function() return 4 end end)
+  check(untilReady(T) and true, "(ready)")
+  check(untilStarted(T) and (lastLog("session started") or ""):find("state profile_4", 1, true) ~= nil
+    and countLogs("read through GetCurrentProfileId") == 1, "without m_CurrentProfileId: the profile through GetCurrentProfileId (profile_4), said once")
+  PDS.GetCurrentProfileId = nil
+  PDS.m_CurrentProfileId = 2
+  os.remove(STATE .. "profile_4.lua")
+end
+do
   -- a progress file is taken record by record: the ones of a shape this version does not write are left out
   local T = start(function()
   local f = io.open(STATE .. "profile_2.lua", "w")
@@ -420,7 +430,7 @@ do
   table.sort(names)
   n, T = run({ { "ExcludeSpecies = {},", "ExcludeSpecies = { " .. table.concat(names, ", ") .. " }," } })
   check((T.status()[2] or ""):find("; rolls none$") ~= nil, "every species excluded: the status names no roll: " .. tostring(T.status()[2]))
-  check((lastLog("loaded:") or ""):find("401 creature spawn points (0 creatures)", 1, true) ~= nil, "(and the load line counts no creature)")
+  check((lastLog("loaded:") or ""):find("402 creature spawn points (0 creatures)", 1, true) ~= nil, "(and the load line counts no creature)")
 end
 
 -- ================================================================ the progress file: which copy is read
@@ -578,7 +588,7 @@ do
   -- the file as it ships
   local T = start()
   check(summaryOf(lastLog("loaded:")) == DEFAULT, "the load line sums up the settings: " .. tostring(summaryOf(lastLog("loaded:"))))
-  check((T.status()[1] or ""):find("^v1%.5%.0 | day %d+ %d%d:%d%d | creatures on 35%%/24h ") ~= nil and (T.status()[1] or ""):sub(-#DEFAULT) == DEFAULT,
+  check((T.status()[1] or ""):find("^v1%.5%.1 | day %d+ %d%d:%d%d | creatures on 35%%/24h ") ~= nil and (T.status()[1] or ""):sub(-#DEFAULT) == DEFAULT,
     "and so does the first status line: " .. tostring(T.status()[1]))
   -- other numbers, everything on / everything off
   setConfig(CUSTOM)

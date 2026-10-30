@@ -1,4 +1,4 @@
-# G1R_MegaMod - handoff, 2026-10-06 (cloud)
+# G1R_MegaMod - handoff, 2026-10-30 (cloud)
 
 Rules and commands: `CLAUDE.md` (read it first). This file: what the project is, where it stands, the next step, the
 queue. Keep it current: when a step is done, change its line here (one line). `mega\PLAN-NEXT.md` and `mega\PLAN.md`
@@ -12,8 +12,9 @@ scavenger's own name; 0.3.4: no "Frozen" on every hit) and settings app 2.1.1, b
 data - is on that PC only, not here. The deploy scripts read the PC's places from `deploy/deploy_settings.json` (not
 committed). From now on this repository is the source; `<h>\mega` on the PC is the state of 0.3.4.
 
-- In the cloud: P5 DONE (0.3.5 + app 2.1.2, committed, not installed); P3 facts of the 0.3.2 session DONE.
-- Next, local session: release 0.3.5 + app 2.1.2 (section 3).
+- The game got its Feature Update 1 on 2026-10-29, with the official ModKit (the game's scripts, public): P7. In the
+  cloud: the mod's data and names checked against it, 0.3.6 made (committed, not installed; it contains 0.3.5).
+- Next, local session: P7 steps 1-4 on the PC, then release 0.3.6 + app 2.1.2 (section 3).
 - Needs the PC (a local session): installs and audits, rehearsals, the app's UI tests, anything that reads the game.
 - README.md and the mod's README.txt say at the top that everything is written by AI, may have bugs, and ask for
   issues on GitHub (the player, 2026-10-08).
@@ -80,23 +81,25 @@ committed). From now on this repository is the source; `<h>\mega` on the PC is t
 
 ## 3. Next step
 
-**Local session: release megamod 0.3.5 + settings app 2.1.2** (P5, made in the cloud 2026-10-06; only texts changed,
-no setting / default / range / logic). Cloud checks: suite 27 / 7470 ALL PASSED, lint 187 / 0, `build_release.py
---check` OK (1033 files); every schema compared field by field with 0.3.4 (only Header / Notes / Hint / Comment /
-Menu / MenuLabel / Label / Unit differ); app fixtures regenerated (`gen_fixtures.sh`). C# checked in the cloud with the
-new `app/tools/linux_check.py`: filetests `--selftest` 176 ok (+1 expected: the stand-in start-screen value), `--live`
-ALL OK, the whole app compiled for net8.0-windows with 0 errors / 0 warnings; not run in the cloud: the exe's own
-`--selftest` / `--uitest` / pictures. Steps on the PC, game closed where it says so:
-1. Pull the repository; `app/src/StartupLoadingScreen.txt` from `app/tools/make_startup_screen.py` if missing.
+**Local session: the game update (P7 steps 1-4), then release megamod 0.3.6 + settings app 2.1.2.** 0.3.6 = 0.3.5
+(P5: shorter settings texts) + the changes for Feature Update 1 (P7: magic 1.0.2, repopulate 1.5.1, melee 1.0.1,
+keys 1.1.1, data tables). Cloud checks: suite 27 / 7478 ALL PASSED, lint 188 / 0, `build_release.py --check` OK;
+`dev/tools/modkit_check.py` TABLES MATCH THE GAME; every schema compared field by field with 0.3.4 (only texts);
+app fixtures regenerated; `app/tools/linux_check.py`: LINUX CHECK OK (filetests `--selftest` 176 ok + 1 expected,
+`--live` ALL OK, the app compiled with 0 errors / 0 warnings); not run in the cloud: the exe's own `--selftest` /
+`--uitest` / pictures. Steps on the PC, game closed where it says so:
+1. Pull the repository; `app/src/StartupLoadingScreen.txt` from `app/tools/make_startup_screen.py` - remade from
+   the updated game in any case (P7 step 3).
 2. Build app 2.1.2; exe `--selftest`, `--uitest`, filetests selftest + `--live` (needs `lua5.4`), `--snapshot` normal +
    smallest: look at every page (texts shorter: Overview, World pages, Map pins, module pages). Fix if a test pinned a
    text the cloud missed (strings changed: `GameStart.cs` notes / status, `OtherMods.cs` status, `MainForm.cs` repopulate
    pages, Overview notes, tool tips; tests updated: `SelfTestGameStart.cs`, `SelfTestModules.cs` Find "Large gain from").
-3. Package the release way (forbid file + foreign packages): `G1R_MegaMod-0.3.5-dev.zip`; installer `PACKAGE` ->
-   0.3.5-dev (both copies); rehearsal 47/47; install mod + app (the player's config.lua files stay byte-identical:
-   only the shipped defaults' comments changed); AUDIT OK; notes `<proj>\G1R_MegaMod-0.3.5-notes.md`.
-Then P3 for the sessions after 0.3.4 (the scavenger's name - notes `mount.name_*`; no "Frozen" on hits; MV5 re-summon
-under movement 1.1.0; MV6 hero speed when the player sets it; how the drawn pins look).
+3. Package the release way (forbid file + foreign packages): `G1R_MegaMod-0.3.6-dev.zip`; installer `PACKAGE` ->
+   0.3.6-dev (both copies); rehearsal 47/47; install mod + app (the player's config.lua files stay byte-identical:
+   only the shipped defaults' comments changed); AUDIT OK (the audit will also see the game's own files the update
+   replaced: expected); notes `<proj>\G1R_MegaMod-0.3.6-notes.md` (what the update means for him: P7).
+Then P3 for the first session on the new version (P7 step 5) and the sessions after 0.3.4 (the scavenger's name -
+notes `mount.name_*`; no "Frozen" on hits; MV5 re-summon under movement 1.1.0; MV6 hero speed; how the drawn pins look).
 
 Done before: **0.3.3 (P4 item 7, the scavenger's name)**, waiting from 11:02 while the game ran 10:32-12:44; installed
 12:46. Package `<proj>\megamod\G1R_MegaMod-0.3.3-dev.zip` sha256 `cc388e94...0dcc` (also in `incoming-0.3.3`;
@@ -417,6 +420,33 @@ Done: all 14 module schemas + MapPinsSchema (comments of self-explanatory items 
 regenerated, menu limits kept (test_settings 9b); harnesses follow the new menu names / hints, and an empty menu hint
 is allowed now (locks / regen "nothing cut off" checks). Group titles and xp / general note+hint counts unchanged (the
 app's UI test pins them). App: GameStart / OtherMods messages, MainForm repopulate pages, Overview notes, tool tips.
+
+### P7 - the game's Feature Update 1 (2026-10-29) and the official ModKit (the player 2026-10-30)
+"Gothic 1 was updated today, also had this release, see what you need to do to update the game and mods" (the ModKit
+site). Read `research/feature-update-1.md` first. Cloud part DONE 2026-10-30: the ModKit cloned (the game's scripts
+as shipped + the reference of the native classes); repopulate data, lock tables, magic, timers, movement, mining,
+map pins, intro and the facts' native members compared (`dev/tools/modkit_check.py`, new); fixed: magic's circle
+price `SPCost` -> `m_SPCost` (renamed by the update: "Own prices for the magic circles" would have done nothing),
+three crypt chests, 12 new item spots, one event-only spot left out, one new snapper point, the lock name spelling;
+fallbacks `GetCurrentProfileId()` (repopulate, melee) and `GetPlayerWidget()` (keys) for fields the reference does
+not name. Tests + mutation of every changed line (magic 3 killed + 1 accepted, repopulate 3, melee 1, keys 3 killed).
+Steps on the PC (a local session; never start the game - the player does):
+1. Game closed: what the update replaced - the executable's version and hashes, `ue4ss\UE4SS.dll` still sha256
+   `e1909f98...caa3`, `dwmapi.dll` / `mods.txt` / `mods.json` untouched (Steam leaves files it does not know); the
+   audit (`audit_megamod.py`). A copy of the save folder before the first load on the new version (the update
+   migrates saves when it loads them; the mod only reads saves).
+2. Diff `<proj>\as-src` (Build83) against the ModKit's `Script` (`git clone --depth 1
+   https://github.com/AlkimiaInteractive/G1R-Modkit`): every change of the update; confirm that the 12 item spots and
+   `NEF_SNAPPER_SPAWN_01_CH2` are new (else take them out again) and look for changes in what the facts cite.
+3. `app/tools/make_startup_screen.py` on the updated paks; compare with the old `StartupLoadingScreen.txt`. If the
+   value changed and the player skips the logos, the app must save Game.ini anew (with the game closed).
+4. The other authors' mods and the UE4SS fork: their pages for versions made for the update (a decision of the
+   player before anything is replaced - CLAUDE.md section 1).
+5. The player's first session on the new version (0.3.6 installed, section 3): UE4SS.log (does UE4SS start; errors),
+   the megamod's report and notes - `magic.properties` (`m_SPCost`), `keys.player_widget` (which way), the repopulate
+   lines (profile; "read through GetCurrentProfileId"?), `markers.*`, `mount.*`, `timers.*`. Then the facts
+   (P3). If the game does not start with UE4SS, tell the player at once; nothing of the megamod can run then.
+Later, the player's decision: official mod packages instead of UE4SS Lua (research/feature-update-1.md, last part).
 
 ## 5. Open questions for the player (asked once; do not ask again, act on the answer when it comes)
 

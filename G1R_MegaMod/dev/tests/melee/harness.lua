@@ -444,7 +444,7 @@ do
     local c = start("load")
     local ue, w = c.ue, c.world
     check(c.ok, "the module loads (" .. tostring(c.err) .. ")")
-    check(#ue.printed == 1 and ue.printed[1] == "[G1R_Melee] v1.0.0 loaded: nothing to change (flow helper left to the game, hit stop 100 %, camera shake on hits)\n",
+    check(#ue.printed == 1 and ue.printed[1] == "[G1R_Melee] v1.0.1 loaded: nothing to change (flow helper left to the game, hit stop 100 %, camera shake on hits)\n",
         "one load line: " .. tostring(ue.printed[1]):gsub("\n", ""))
     check(#ue.loops == 2 and ue.loops[2].ms == 250 and math.type(ue.loops[2].ms) == "integer", "one game-thread loop of its own, every 250 ms")
     check(ue.console.melee ~= nil and ue.console.g1r_melee ~= nil and #ue.loadMapPre == 1 and #ue.loadMapPost == 1 and (ue.calls.RegisterHook or 0) == 0,
@@ -458,7 +458,7 @@ do
     check(w.sloppy() == true and w.stores == 0 and near(w.freeze("m_HitFreezeParams", "Standard"), f32(0.05)) and w.shake("m_AttackCameraShakeParams", "Standard") == "MatineeCameraShake_Combat_Standard",
         "the game is untouched: flow helper, hit stop, camera shake")
     local lines = c.hook.status()
-    check(#lines == 3 and lines[1] == "v1.0.0 | nothing to change (flow helper left to the game, hit stop 100 %, camera shake on hits)"
+    check(#lines == 3 and lines[1] == "v1.0.1 | nothing to change (flow helper left to the game, hit stop 100 %, camera shake on hits)"
         and lines[2] == "nothing to change: the game is not looked at"
         and lines[3] == "changes: 0; flow helper set 0 time(s), put back 0; table values written 0, put back 0; looks 0 (0 while paused)", "the status says so, in three lines")
     check(T.read(c.path) == shipped and #ue.errors == 0, "the settings file is left as it is; no error")
@@ -470,7 +470,7 @@ section("2. the flow helper: set the game's own way, kept as set, put back")
 do
     local c = start("flow-off", { config = OFF, diag = true, widgets = true })
     local ue, w, F = c.ue, c.world, c.S.flow
-    check(printed(ue, "[G1R_Melee] v1.0.0 loaded: flow helper off\n") ~= nil, "the load line names what is asked for")
+    check(printed(ue, "[G1R_Melee] v1.0.1 loaded: flow helper off\n") ~= nil, "the load line names what is asked for")
     check(w.press("R01", "Right", "recovery") == "L01_NoCombo" and w.press("L01", "Left", "recovery") == "R01_NoCombo",
         "the game as it comes: the same direction again while a swing recovers starts the mirrored follow-up swing")
     check(sum(w.calls) == 0 and #ue.lookups == 0, "loading asks nothing of the game")
@@ -665,6 +665,14 @@ do
     c.world.gameSets(true)
     c.seconds(3)
     check(c.S.flow.before["3"] == true and c.fake.value("melee.profile") == 3, "a profile number arrives as a plain number: profile 3")
+    stop(c)
+    -- no property m_CurrentProfileId, but the subsystem's function for it (the game's Feature Update 1 names only that)
+    c = start("profile-function", { config = OFF, diag = true })
+    c.world.persistent.m_CurrentProfileId = nil
+    c.world.persistent.GetCurrentProfileId = function() return 4 end
+    c.world.gameSets(true)
+    c.seconds(3)
+    check(c.S.flow.before["4"] == true and c.fake.value("melee.profile") == 4, "without m_CurrentProfileId: the profile through GetCurrentProfileId (4)")
     stop(c)
 end
 
@@ -916,7 +924,7 @@ do
     local b = w.blow("Standard")
     check(near(b.attacker, 0.05) and near(b.target, 0.05) and near(b.blend, 0.05) and untouched(w),
         "the game as it comes: a standard blow stops both fighters for 0.05 s and lets them pick up speed over 0.05 s")
-    check(printed(ue, "[G1R_Melee] v1.0.0 loaded: hit stop 50 %\n") ~= nil and w.walks == 0 and #ue.lookups == 0, "the load line names what is asked for; loading does not look at the game")
+    check(printed(ue, "[G1R_Melee] v1.0.1 loaded: hit stop 50 %\n") ~= nil and w.walks == 0 and #ue.lookups == 0, "the load line names what is asked for; loading does not look at the game")
     c.ticks(1)
     check(freezesAt(w, 0.5), "at the first look every freeze and blend-out time of both tables is half the game's; the time dilation is the game's")
     b = w.blow("Standard")
@@ -933,7 +941,7 @@ do
     check(S.written == 24 and S.putBack == 0 and S.count.m_AttackFreezeParams == 6 and S.count.m_HitFreezeParams == 6 and S.feedback == "GenericMeleeFeedback " .. FEEDBACK_PATH,
         "the module holds: 24 values written, 6 entries per table, the object's name")
     local lines = c.hook.status()
-    check(#lines == 5 and lines[1] == "v1.0.0 | hit stop 50 %" and lines[2] == "flow helper: left to the game" and lines[3] == "hit stop: 50 % of the game's in 12 of 12 entries"
+    check(#lines == 5 and lines[1] == "v1.0.1 | hit stop 50 %" and lines[2] == "flow helper: left to the game" and lines[3] == "hit stop: 50 % of the game's in 12 of 12 entries"
         and lines[4] == "camera shake on hits: as the game has it"
         and lines[5] == "changes: 1 (last: hit stop 50 %); flow helper set 0 time(s), put back 0; table values written 24, put back 0; looks 1 (0 while paused)",
         "the status: " .. table.concat(lines, " | "))
@@ -1030,7 +1038,7 @@ do
     local b = w.blow("Standard")
     check(b.shake == "MatineeCameraShake_Combat_Standard" and b.hitShake == "MatineeCameraShake_Combat_Standard" and w.blow("Deflected").hitShake == "MatineeCameraShake_None",
         "the game as it comes: a standard blow shakes the camera of the one who strikes and of the one who is hit; some kinds of blow name the class for no shake")
-    check(printed(ue, "[G1R_Melee] v1.0.0 loaded: no camera shake on hits\n") ~= nil, "the load line names what is asked for")
+    check(printed(ue, "[G1R_Melee] v1.0.1 loaded: no camera shake on hits\n") ~= nil, "the load line names what is asked for")
     c.ticks(1)
     b = w.blow("Standard")
     check(shakesAre(w, true) and b.shake == "MatineeCameraShake_None" and b.hitShake == "MatineeCameraShake_None" and w.blow("Parried").shake == "MatineeCameraShake_None",
@@ -1049,7 +1057,7 @@ do
     check(printedCount(ue, "[G1R_Melee] changed in the game: no camera shake on hits\n") == 1 and c.ui.note() == "Melee: no camera shake on hits" and printed(ue, "stays as the game has it") == nil,
         "one line in the log, one note on screen")
     local lines = c.hook.status()
-    check(#lines == 5 and lines[1] == "v1.0.0 | no camera shake on hits" and lines[3] == "hit stop: as the game has it" and lines[4] == "camera shake on hits: none in 13 of 13 entries"
+    check(#lines == 5 and lines[1] == "v1.0.1 | no camera shake on hits" and lines[3] == "hit stop: as the game has it" and lines[4] == "camera shake on hits: none in 13 of 13 entries"
         and lines[5] == "changes: 1 (last: no camera shake on hits); flow helper set 0 time(s), put back 0; table values written 10, put back 0; looks 1 (0 while paused)",
         "the status: " .. table.concat(lines, " | "))
 
@@ -1436,13 +1444,13 @@ section("8. all three at once; the module switched off and on")
 do
     local c = start("all", { config = ALL, diag = true, widgets = true })
     local ue, w, S = c.ue, c.world, c.S
-    check(printed(ue, "[G1R_Melee] v1.0.0 loaded: flow helper off, hit stop 50 %, no camera shake on hits\n") ~= nil, "the load line names all three")
+    check(printed(ue, "[G1R_Melee] v1.0.1 loaded: flow helper off, hit stop 50 %, no camera shake on hits\n") ~= nil, "the load line names all three")
     c.ticks(1)
     check(w.sloppy() == false and freezesAt(w, 0.5) and shakesAre(w, true), "one look sets all three")
     check(printedCount(ue, "[G1R_Melee] changed in the game: flow helper off, hit stop 50 %, no camera shake on hits\n") == 1
         and c.ui.note() == "Melee: flow helper off, hit stop 50 %, no camera shake on hits" and S.changes == 1, "one line in the log, one note on screen")
     local lines = c.hook.status()
-    check(#lines == 5 and lines[1] == "v1.0.0 | flow helper off, hit stop 50 %, no camera shake on hits" and lines[2] == "flow helper: wanted off, the game has it off (through the option object)"
+    check(#lines == 5 and lines[1] == "v1.0.1 | flow helper off, hit stop 50 %, no camera shake on hits" and lines[2] == "flow helper: wanted off, the game has it off (through the option object)"
         and lines[3] == "hit stop: 50 % of the game's in 12 of 12 entries" and lines[4] == "camera shake on hits: none in 13 of 13 entries"
         and lines[5] == "changes: 1 (last: flow helper off, hit stop 50 %, no camera shake on hits); flow helper set 1 time(s), put back 0; table values written 34, put back 0; looks 1 (0 while paused)",
         "the status: " .. table.concat(lines, " | "))
@@ -1457,7 +1465,7 @@ do
     check(printedCount(ue, "[G1R_Melee] changed in the game: flow helper as the game had it (on), hit stop as the game has it, camera shake on hits as the game has it\n") == 1
         and c.ui.note() == "Melee: flow helper as the game had it (on), hit stop as the game has it, camera shake on hits as the game has it", "one line in the log, one note on screen")
     lines = c.hook.status()
-    check(#lines == 3 and lines[1] == "v1.0.0 | switched off in the settings" and lines[2] == "nothing to change: the game is not looked at"
+    check(#lines == 3 and lines[1] == "v1.0.1 | switched off in the settings" and lines[2] == "nothing to change: the game is not looked at"
         and lines[3] == "changes: 2 (last: flow helper as the game had it (on), hit stop as the game has it, camera shake on hits as the game has it); "
         .. "flow helper set 1 time(s), put back 1; table values written 34, put back 34; looks 22 (0 while paused)", "the status: " .. table.concat(lines, " | "))
     local calls, walks, lookups = sum(w.calls), w.walks, #ue.lookups
@@ -1662,8 +1670,8 @@ do
 
     -- the console
     local before = #ue.printed
-    check(ue:fireConsole("melee") == true and ue.printed[before + 1] == "[G1R_Melee] v1.0.0 | no camera shake on hits\n" and #ue.device.lines == #ue.printed - before
-        and ue.device.lines[1] == "[G1R_Melee] v1.0.0 | no camera shake on hits" and #ue.printed - before == 5, "melee: the status, in the log and in the console window")
+    check(ue:fireConsole("melee") == true and ue.printed[before + 1] == "[G1R_Melee] v1.0.1 | no camera shake on hits\n" and #ue.device.lines == #ue.printed - before
+        and ue.device.lines[1] == "[G1R_Melee] v1.0.1 | no camera shake on hits" and #ue.printed - before == 5, "melee: the status, in the log and in the console window")
     check(ue:fireConsole("g1r_melee status") == true and ue:fireConsole("melee something") == true and #ue.printed - before == 15, "g1r_melee works too; an unknown word shows the status")
     check(c.hook.console(nil, nil, nil) == true and c.hook.console("melee reload", nil, nil) == true and c.hook.console("melee", { 2, {} }, {}) == true and #ue.errors == 0,
         "called with nothing, with the command line only, with parameters of another kind: handled")
@@ -1696,7 +1704,7 @@ do
     end
     c = start("percent", { config = T.config("Config.HitStop = 62.4") })
     c.ticks(1)
-    check(printed(c.ue, "[G1R_Melee] v1.0.0 loaded: hit stop 62 %\n") ~= nil and freezesAt(c.world, 0.62) and printed(c.ue, "changed in the game: hit stop 62 %") ~= nil, "a percentage with decimals is used as a whole number")
+    check(printed(c.ue, "[G1R_Melee] v1.0.1 loaded: hit stop 62 %\n") ~= nil and freezesAt(c.world, 0.62) and printed(c.ue, "changed in the game: hit stop 62 %") ~= nil, "a percentage with decimals is used as a whole number")
     stop(c)
 
     -- the hidden settings
@@ -1830,7 +1838,7 @@ section("13. what the diagnostics get")
 do
     local c = start("diag", { config = ALL, diag = true, widgets = true })
     local ue, w = c.ue, c.world
-    check(c.fake.versions[1] == "1.0.0" and #c.fake.status == 1 and #c.fake.dump == 1 and #c.fake.notes == 0, "at load: the version, a status function, a dump function; no note yet")
+    check(c.fake.versions[1] == "1.0.1" and #c.fake.status == 1 and #c.fake.dump == 1 and #c.fake.notes == 0, "at load: the version, a status function, a dump function; no note yet")
     c.ticks(1)
     local sequence = table.concat(c.fake.sequence(), " ")
     check(sequence == "melee.flow.game_value=on melee.profile=0 melee.flow.way=option object melee.flow.write=ok melee.feedback=found melee.stop.attack=6 melee.stop.write=ok melee.stop.hit=6 "
@@ -1854,12 +1862,12 @@ do
     local Fake = dofile(HERE .. "../markers/diag_fake.lua")
     local plain, where = Fake.plain(dump)
     check(plain and Fake.roundTrip(dump), "the dump is plain data (" .. tostring(where) .. ")")
-    check(dump.version == "1.0.0" and dump.enabled == true and dump.flow_helper == "off" and dump.hit_stop == 50 and dump.hit_shake == false and dump.hero == true and dump.looks == c.S.looks
+    check(dump.version == "1.0.1" and dump.enabled == true and dump.flow_helper == "off" and dump.hit_stop == 50 and dump.hit_shake == false and dump.hero == true and dump.looks == c.S.looks
         and dump.flow.way == "option object" and dump.flow.game_value == "off" and dump.flow.before["0"] == "on" and dump.flow.set == 2 and dump.flow.given_up == nil
         and dump.tables_in_hand.m_AttackFreezeParams == 6 and dump.tables_in_hand.m_AttackCameraShakeParams == 7 and next(dump.tables_left_alone) == nil
         and dump.feedback_object == "GenericMeleeFeedback " .. FEEDBACK_PATH and dump.no_shake_class == "MatineeCameraShake_None" and dump.values_written == 34 and dump.feedback_missing == false,
         "the dump: the settings, what the game has, what is remembered")
-    check(#lines == 5 and lines[1] == "v1.0.0 | flow helper off, hit stop 50 %, no camera shake on hits" and has(lines[5], "flow helper set 2 time(s)"), "the status function gives the status lines")
+    check(#lines == 5 and lines[1] == "v1.0.1 | flow helper off, hit stop 50 %, no camera shake on hits" and has(lines[5], "flow helper set 2 time(s)"), "the status function gives the status lines")
     stop(c)
 
     -- the dump of a module that has given things up
@@ -1970,7 +1978,7 @@ do
         "the names of the four changed tables are in the UE4SS shared variable (the module reaches it from inside the loader's environment)")
     check(ue:fireConsole("g1r diag") == true, "g1r diag handled")
     local report = T.read(c.dir .. "/report-latest.txt") or ""
-    check(has(report, "melee: loaded, version 1.0.0") and has(report, "[melee] v1.0.0 | flow helper off, hit stop 50 %, no camera shake on hits")
+    check(has(report, "melee: loaded, version 1.0.1") and has(report, "[melee] v1.0.1 | flow helper off, hit stop 50 %, no camera shake on hits")
         and has(report, "[melee] flow helper: wanted off, the game has it off (through the option object)") and has(report, "[melee] hit stop: 50 % of the game's in 12 of 12 entries")
         and has(report, "[melee] camera shake on hits: none in 13 of 13 entries"), "report: the module's version and its status lines")
     check(has(report, "melee.flow.way = option object") and has(report, "melee.flow.write = ok") and has(report, "melee.flow.game_value = on") and has(report, "melee.profile = 0")
@@ -1985,7 +1993,7 @@ do
         and has(report, "[melee] registered RegisterConsoleCommandHandler: 2 ok, 0 failed") and not has(report, "[melee] lookups"),
         "report: the module's loop and its two console commands; all nine searches are the kit's, the module makes none of its own")
     local log = newest(c, "session-")
-    check(has(log, "[melee] [G1R_Melee] v1.0.0 loaded: flow helper off, hit stop 50 %, no camera shake on hits") and has(log, "[melee] [G1R_Melee] changed in the game: flow helper off, hit stop 50 %, no camera shake on hits"),
+    check(has(log, "[melee] [G1R_Melee] v1.0.1 loaded: flow helper off, hit stop 50 %, no camera shake on hits") and has(log, "[melee] [G1R_Melee] changed in the game: flow helper off, hit stop 50 %, no camera shake on hits"),
         "session log: the load line and the change")
     local crumbAt, eventAt = log:find("[melee] > first walk through a table of the game", 1, true), log:find("[melee] first walk through a table of the game returned: 6 entries", 1, true)
     check(crumbAt ~= nil and eventAt ~= nil and crumbAt < eventAt and has(log, "[melee] > first write of the flow helper through the game's option object")
@@ -1995,7 +2003,7 @@ do
     local okDump, dump = pcall(load(newest(c, "dump-"), "=dump", "t", {}))
     check(okDump and type(dump) == "table" and type(dump.melee) == "table" and dump.melee.hit_stop == 50 and dump.melee.flow.way == "option object" and dump.melee.tables_in_hand.m_HitFreezeParams == 6
         and dump.melee.values_written == 34 and dump._meta.refusedCount == 0, "dump: what the module holds")
-    check(ue:fireConsole("g1r") == true and printed(ue, "[G1R_MegaMod] melee: loaded, version 1.0.0, 0 error(s), 12 note(s)") ~= nil, "g1r lists the module with its notes")
+    check(ue:fireConsole("g1r") == true and printed(ue, "[G1R_MegaMod] melee: loaded, version 1.0.1, 0 error(s), 12 note(s)") ~= nil, "g1r lists the module with its notes")
     check(ue:fireConsole("melee") == true and printed(ue, "[G1R_Melee] hit stop: 50 % of the game's in 12 of 12 entries\n") ~= nil, "the module's own console command works through the loader")
     -- settings through the loader: the in-game menu
     local item = T.menuItem(c, "Combat", "Hit stop")

@@ -95,8 +95,9 @@ Never touched
   items, and items placed by story events.
 
 How it works
-  Built from the game's own data (GORE decompile of the shipped scripts:
-  401 generic creature spawn points with 814 creatures, 2495 item spots,
+  Built from the game's own data (its shipped scripts; since 0.3.6 checked
+  against the official ModKit sources of the game's Feature Update 1:
+  402 generic creature spawn points with 815 creatures, 2506 item spots,
   528 containers) and the game's own functions:
   - creatures are spawned by their own world point (WorldPointScript
     SpawnAIAgent), only at points that were populated in this
@@ -161,13 +162,13 @@ Console (UE4SS console)
   repop save     write the state file now
 
 UE4SS.log lines
-  [G1R_Repopulate] v1.5.0 loaded: 401 creature spawn points ...
+  [G1R_Repopulate] v1.5.1 loaded: 402 creature spawn points ...
   [G1R_Repopulate] session started at day N hh:mm | state profile_X.lua ...
   [G1R_Repopulate] session reset N (map load | the game clock went back |
                    another player controller | the profile changed)
   [G1R_Repopulate] the game's begin / end of play calls are not used any
                    more (reason); objects are found and checked the old way
-  [G1R_Repopulate] world items: 2495 spots set refillable ...
+  [G1R_Repopulate] world items: 2506 spots set refillable ...
   [G1R_Repopulate] creature cycle (timer, due 24h x1): ... respawning N
   [G1R_Repopulate] settings reloaded: creatures on 35%/24h ...
   [G1R_Repopulate] containers: N here, N waiting to restock, N restocked

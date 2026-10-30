@@ -90,6 +90,11 @@ anything.
   what stays UNKNOWN until a session): `q3/feasibility-0.3.0.md` (skip intro, key list, Gothic font, distances of
   other mods), `q3/spell-timers.md` (effect timers). The results are the facts files `dev/facts/intro.md`,
   `keys.md`, `timers.md`, `othermods.md`, `movement.md` and K18 / K19 / M16 (kit, markers).
+- The game's own scripts are public since the game's Feature Update 1 (2026-10-29): the official ModKit
+  (<https://github.com/AlkimiaInteractive/G1R-Modkit>, `Script/`; its branch `gh-pages` holds the reference of the
+  native classes). It is the SOURCE for scripts from that version on (the decompiled `as-src` of the PC is Build83;
+  line numbers in older facts refer to it). What the update changed for the megamod and how it was checked:
+  `feature-update-1.md`; the check again after a later update: `G1R_MegaMod/dev/tools/modkit_check.py`.
 
 ## The player's current settings of the mods our modules take over
 

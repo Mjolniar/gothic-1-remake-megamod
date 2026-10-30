@@ -168,7 +168,7 @@ return {
     ["OC_Chest_Forge_02_Lock"] = { 9, 9 },
     ["OC_Chest_Forge_04_Lock"] = { 10, 10 },
     ["OC_Chest_Gomez_01_Lock"] = { 9, 9 },
-    ["OC_Chest_Cutter_Lock"] = { 8, 8 },
+    ["OC_Chest_CUTTER_Lock"] = { 8, 8 },
     ["OC_Chest_Guard226_Lock"] = { 10, 3 },
     ["OC_Chest_Guard228_Lock"] = { 10, 4 },
     ["OC_Chest_Guard229_Lock"] = { 6, 6 },
