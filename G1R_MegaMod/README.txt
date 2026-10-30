@@ -2,7 +2,7 @@ G1R_MegaMod 0.3.6 - Gothic 1 Remake, UE4SS Lua
 ===============================================
 
 Written entirely by AI: it may have bugs. Please report any error or
-problem as an issue on GitHub: https://github.com/Mjolniar/G1R_MegaMod/issues
+problem as an issue on GitHub: https://github.com/Mjolniar/gothic-1-remake-megamod/issues
 (what you did, what happened, and if you can UE4SS.log and the folder
 Scripts/diagnostics).
 
