@@ -1,229 +1,148 @@
 Module "locks" (lock picking that follows the hero's skill 1.0) - Gothic 1 Remake, UE4SS Lua
 ============================================================================================
+AI-generated. Bugs: see G1R_MegaMod\README.txt.
 
-What it does
-  A lock is a row of pieces that have to be brought to the middle. The pieces
-  are connected: moving one drags others along - that is what makes a lock
-  hard. The game makes locks easier as the hero's lock picking skill grows:
-  it takes none of a lock's connections away for the untrained, the first
-  one for a skilled hero, the first two for a master. And a lock pick stands
-  2 wrong moves (a move a piece cannot make) for the untrained, 4 for the
-  skilled, 6 for a master before it breaks.
+Function
+  A lock is a row of connected pieces to bring to the middle; moving one drags others.
+  The game removes connections by skill: none for untrained, the first for skilled, the
+  first two for master. A pick survives 2 / 4 / 6 wrong moves (moves a piece cannot make).
+  This module sets both per skill level: connections removed, and wrong moves per pick
+  (or picks never break). A note says what changed when a lock starts.
+  Ships "as the game has it". Off or all levels at game values = game not read.
 
-  This module lets you choose both numbers for each of the three skill
-  levels: how many connections are taken away, and how many wrong moves a
-  lock pick takes - or that lock picks do not break at all. A short note on
-  screen says what was changed when the hero starts on a lock.
+Settings (Scripts\config.lua; app page "Lock picking"; in-game menu "G1R Lock picking";
+file ~5 s, menu at once; applies from the next lock, never to a lock in progress)
+    Enabled                false = off
 
-  The mod ships with everything "as the game has it": nothing changes until
-  you choose something. With the module switched off, or with every level as
-  the game has it, the module does not look at the game at all.
-
-Settings
-  Scripts\config.lua in this folder, the settings app (page "Lock picking"),
-  or the in-game mod menu (entry "G1R Lock picking"). Changes are picked up
-  while the game runs (a changed file within about 5 seconds, the menu at
-  once). They count from the next lock on: a lock that is being picked is
-  never changed.
-
-    Enabled                false = the module does nothing
-
-    UntrainedConnections   connections taken away from a lock while the hero
-    SkilledConnections     is untrained / skilled / a master:
+    UntrainedConnections   connections removed while untrained / skilled / master:
+    SkilledConnections
     MasterConnections
         "as the game has it"   untrained none, skilled 1, master 2
-        "none"                 every connection stays (harder for a skilled
-                               hero or a master)
-        "1", "2"               the first one / the first two
-        "all"                  every piece moves on its own
-        "half"                 by the lock: half of its connections
-        "safe"                 by the lock: as many as the lock is proven to
-                               stay solvable with (see below)
+        "none"                 none removed (harder for skilled and master)
+        "1", "2"               first one / first two
+        "all"                  every piece moves alone
+        "half"                 half of this lock's connections
+        "safe"                 as many as this lock is proven solvable with (below)
 
-    PicksNeverBreak        true = lock picks do not break in the middle of a
-                           lock
-    UntrainedWrongMoves    wrong moves a lock pick takes before it breaks:
-    SkilledWrongMoves      0 = as the game has it (2 / 4 / 6), or 1 to 99
-    MasterWrongMoves       (not used while PicksNeverBreak is true)
+    PicksNeverBreak        true = picks never break mid-lock
+    UntrainedWrongMoves    wrong moves per pick:
+    SkilledWrongMoves      0 = game (2 / 4 / 6), or 1 to 99
+    MasterWrongMoves       (ignored while PicksNeverBreak is true)
 
-    ShowMessage            a short note on screen when the hero starts on a
-                           lock that this module changed
-    LogLocks               one line in UE4SS.log for every lock the hero
-                           starts on, with what was changed for it
+    ShowMessage            note when a changed lock starts
+    LogLocks               UE4SS.log line per lock started, with changes
 
-  In the in-game menu a choice is a number: 1 = as the game has it,
-  2 = none, 3 = 1, 4 = 2, 5 = half, 6 = safe, 7 = all. The menu also has the
-  button "Put the game's own values back now" (see "Saves" below).
-  In config.lua the choices are texts, with the quotation marks:
-  Config.SkilledConnections = "2", not = 2.
+  In-game menu choices are numbers: 1 = as the game has it, 2 = none, 3 = 1, 4 = 2,
+  5 = half, 6 = safe, 7 = all. Button: "Put the game's own values back now" (see Saves).
+  In config.lua choices are quoted text: Config.SkilledConnections = "2", not = 2.
 
-  Example - the untrained hero as the game has him, the skilled one as easy
-  as each lock allows, the master without any connection:
+  Example - untrained as the game, skilled as easy as each lock allows, master with no
+  connections:
     Config.SkilledConnections = "safe"
     Config.MasterConnections = "all"
 
-  Console (UE4SS console):  locks            what the module is doing
-                            locks reload     read config.lua now
-                            locks restore    put the game's own values back
-                                             (see "Saves")
+  Hidden (add to config.lua by hand):
+    LookSeconds = 1    hero check interval (0.25 to 10 s)
+
+  Console (UE4SS console):  locks            status
+                            locks reload     re-read config.lua
+                            locks restore    restore game values (see Saves)
 
 Which choices are safe
-  With some of its connections taken away a lock can become impossible to
-  open. So the module only offers numbers that were checked against the
-  game's own lock definitions (346 locks; 332 of them belong to a chest or
-  a door, the other 14 to a random-lock feature the game has switched off):
-  - "none", "1", "2" and "all": each of the 332 locks can be opened with
-    each of these. "1" and "2" are what the game itself uses for the skilled
-    hero and the master.
-  - A fixed 3, 4, 5 ... is not offered: 78 of the 332 locks cannot be opened
-    any more with some number between 3 and all of their connections taken
-    away.
-  - "safe" takes, for each lock, the largest number that is proven: the lock
-    can be opened with that many taken away and with every smaller number.
-    For 267 of the 346 locks that is all of their connections; for the others
-    between 1 and 6.
-  - "half" takes half of the lock's connections (rounded down), but never
-    more than the "safe" number.
-  - "half" and "safe" never take fewer away than the game does itself at the
-    hero's level, for every lock of a chest or door in the world. (One test
-    lock in the game's data that no chest or door uses cannot be opened at
-    the master's own number even in the unchanged game; the table has the
-    largest number it can be opened with.)
-  "Can be opened" was checked by a program that tries every position a lock
-  can be in; the test suite of the mod plays a way to open every lock for
-  every number the module can write. The check rests on how the game's
-  minigame works as read from the game's program code (see "In the game").
-  The numbers for "half" and "safe" are in Scripts\lockdata.lua. They belong
-  to this version of the game: a lock that is not in the file is left as the
-  game has it. If a game update should change existing locks, use "all" or
-  "as the game has it" until the file has been made anew. A lock that
-  cannot be opened is not damaged: leave it, choose another setting and
-  start on it again (the lock's own reset key puts its pieces back to where
-  they started).
+  Removing connections can make a lock unsolvable. Choices were checked against the
+  game's 346 lock definitions (332 on chests or doors; 14 for a disabled random-lock
+  feature):
+  - "none", "1", "2", "all": every one of the 332 locks stays solvable. "1" and "2" are
+    the game's own skilled/master values.
+  - Fixed 3, 4, 5 ... not offered: 78 of 332 locks become unsolvable at some value from 3
+    up to all.
+  - "safe": per lock, the largest proven value (solvable at it and every smaller value).
+    For 267 of 346 locks that is all connections; others 1 to 6.
+  - "half": half the connections (rounded down), capped at "safe".
+  - "half" and "safe" never remove fewer than the game does at the hero's level, for
+    every chest or door lock. (One unused test lock is unsolvable at the master value
+    even in the unchanged game; the table holds its largest solvable value.)
+  "Solvable" was checked by a program trying every lock position; the test suite plays a
+  solution for every lock at every value the module can write. Based on the minigame
+  rules read from the game's code (see In the game).
+  "half"/"safe" values are in Scripts\lockdata.lua, for this game version. Locks not in
+  the file stay as the game has them. After a game update that changes locks, use "all"
+  or "as the game has it" until the file is rebuilt. An unsolvable lock is not damaged:
+  leave it, change the setting, start again (the lock's reset key restores its pieces).
 
-What you will notice
-  - "half" and "safe" work for chests. A door's lock is left as the game has
-    it with these two choices (untrained none, skilled 1, master 2 taken
-    away): the module cannot learn early enough which lock a door has. The
-    fixed choices ("none", "1", "2", "all") work for doors and chests alike.
-  - A setting changed while a lock is being picked counts from the next
-    lock. A pick that breaks in the middle of a lock does not change the
-    lock either.
-  - When the hero learns the next level of the skill, the module writes the
-    numbers chosen for that level within a second.
-  - The game uses a lock pick up in two ways: it breaks when it has taken
-    its number of wrong moves, and a pick that has taken at least one wrong
-    move is gone when the hero leaves the lock without opening it. The
-    wrong-moves settings and "lock picks do not break" change the first,
-    not the second: giving up on a lock after a wrong move still costs the
-    pick, as in the game. Opening the lock keeps it.
-  - The module changes nothing else about lock picking: not the experience
-    for a picked lock, not who notices the hero at a lock, not the lock
-    picks in the inventory.
+Behaviour
+  - "half"/"safe" apply to chests only; doors get the game's values with these two
+    choices (the door's lock is not known early enough). Fixed choices work for both.
+  - A setting changed mid-lock applies from the next lock. A pick breaking mid-lock does
+    not change the lock either.
+  - When the hero learns the next skill level, its values are written within a second.
+  - The game consumes picks two ways: breaking after its wrong-move limit, and losing a
+    pick with at least one wrong move when leaving without opening. These settings
+    change only the first; giving up after a wrong move still costs the pick. Opening
+    keeps it.
+  - Unchanged: XP for picking, who notices you, picks in the inventory.
 
 Saves
-  The two numbers are values of the hero, and the game stores every value of
-  the hero in its saves.
-  - While a fixed choice or a number of wrong moves is in force, a save made
-    then holds the changed number. As long as the module stays on that makes
-    no difference: it would write the same number anyway.
-  - With "half" and "safe" the changed number is only in place from the
-    moment a chest's lock starts until that lock is over. Should the game
-    save in that time, the save holds that one lock's number. Between
-    locks the module looks at the number at every look and puts the game's
-    own back when it finds another (UE4SS.log says so once), so that the
-    number of one lock cannot meet another lock - with it a door could
-    become impossible to open.
-  - Switching the module off (Enabled = false), or setting a level back to
-    "as the game has it", while the game runs: the module first puts the
-    game's own numbers for the hero's level back - at once, or as soon as a
-    lock that is being picked is over - and then stops looking at the game.
-    A save made after that is clean.
-  - A changed number can stay behind in a save when the game is closed (or
-    crashes) while the module has it changed, and the module is switched off
-    or the mod removed before that save is played again. From what the
-    game's program code shows, the game sets its own numbers again whenever
-    a save is loaded, which would repair this by itself - but that has not
-    been seen in the game yet.
-  - The remedy, if lock picking is still changed although the module is off:
-    leave the mod installed and this module loaded (its switch Enabled may be
-    false), load the save and press "Put the game's own values back now" in
-    the in-game mod menu (entry "G1R Lock picking"), or type  locks restore
-    in the UE4SS console. The module writes the game's own numbers for the
-    hero's level once and says what it did. Then save. Should the module
-    answer that it cannot tell the hero's level, name it:
+  Both values are hero attributes and are saved.
+  - With a fixed choice or wrong-move count active, saves hold the changed value. No
+    effect while the module stays on.
+  - With "half"/"safe" the value is changed only while a chest lock is open; a save then
+    holds that lock's value. Between locks the module restores the game value when it
+    finds another (logged once), so one lock's value never meets another lock - which
+    could make a door unsolvable.
+  - Turning the module off (Enabled = false) or a level back to "as the game has it"
+    while running: the game values for the hero's level are restored first (at once, or
+    after the current lock), then the module stops. Later saves are clean.
+  - A changed value can stay in a save if the game closes or crashes while changed and
+    the module is off or removed before that save is loaded. The game's code suggests it
+    resets its values on load, which would fix this - not confirmed in game.
+  - Fix, if lock picking is still changed with the module off: keep the mod installed and
+    this module loaded (Enabled may be false), load the save, press "Put the game's own
+    values back now" (in-game menu "G1R Lock picking") or type  locks restore  in the
+    UE4SS console. Then save. If the module cannot tell the hero's level, name it:
     locks restore untrained  /  locks restore skilled  /  locks restore master.
-  - Before removing the mod for good: switch this module off while the game
-    runs, wait a second, save.
-  A number that stays behind does no harm to the save itself: locks are
-  then easier (or harder) than the game would make them until the game
-  writes its own numbers again, which it does when the hero learns a level
-  of the skill. One case is worse: a number of "half" / "safe" that stayed
-  behind (a save made in the middle of a chest's lock) while the module is
-  off or removed - with the number of another lock a few locks cannot be
-  opened at all. The remedy above puts that right too.
+  - Before removing the mod for good: turn this module off in game, wait a second, save.
+  A leftover value does not damage the save: locks are easier or harder until the game
+  rewrites its values (when the hero learns a skill level). Worse case: a leftover
+  "half"/"safe" value (save made mid chest lock) with the module off or removed can make
+  a few locks unsolvable. The fix above repairs that too.
 
 Other lock picking mods
-  Use one at a time. While the mod "SkillfulLocks" is enabled, this module is
-  not loaded (UE4SS.log: "locks left to the separate mod SkillfulLocks"), so
-  the two never write the same value. To use this module instead, disable or
-  remove SkillfulLocks and carry its settings over:
+  One at a time. While "SkillfulLocks" is enabled this module is not loaded (UE4SS.log:
+  "locks left to the separate mod SkillfulLocks"). To switch, disable it and carry over:
     untrained: left alone   ->  UntrainedConnections = "as the game has it"
     skilled: "auto"         ->  SkilledConnections = "safe"
     master: "all"           ->  MasterConnections = "all"
-  "safe" is this module's own answer to the same question (how many
-  connections can go without making the lock impossible), from its own check
-  of the game's locks. The difference you will see: at a door the skilled
-  hero gets the game's own lock (1 connection taken away), not the easier
-  one.
-
-A setting that is not shown (add it to config.lua by hand if needed)
-    LookSeconds = 1    how often the module looks at the hero (0.25 to 10
-                       seconds)
+  "safe" is this module's own check of the same question. Difference: at doors the
+  skilled hero gets the game's lock (1 removed), not an easier one.
 
 How it works
-  The two numbers are attributes of the hero's player state
-  (LockpickPrecision and LockpickDurability). The game reads them at the
-  moment a lock is set up. Once a second the module looks which skill level
-  the hero has (the game marks it with a tag), whether a lock is being picked
-  (another tag), and what the two attributes hold; a number that differs from
-  the chosen one is written and read back. Nothing is written while a lock is
-  being picked. The module remembers which numbers are its own and puts the
-  game's back before it stops.
-  For "half" and "safe" the module has to know the lock before the game sets
-  it up. It hooks one function of the game - the one that starts the lock of
-  a chest - once, and only when such a choice is in use, reads the lock's
-  name there and writes the number for that lock; when the lock is over the
-  game's own number is put back. If that hook cannot be set up, or the game
-  never calls it, these two choices leave every lock as the game has it, and
-  the module says so (UE4SS.log, the command locks).
-  The module registers nothing else: no notification, no search by name that
-  could repeat. (A crash of the game on 2026-10-01 came from another mod that
-  repeated a search for a function that does not exist at every lock.)
+  The values are hero player state attributes LockpickPrecision and LockpickDurability,
+  read by the game when a lock is set up. Once a second the module reads the skill level
+  (a tag), whether a lock is in progress (another tag) and both attributes; a differing
+  value is written and read back. Nothing is written mid-lock. Own values are tracked
+  and the game's restored before stopping.
+  "half"/"safe" need the lock before setup: the module hooks the function that starts a
+  chest lock (once, only while such a choice is in use), reads the lock name and writes
+  its value; the game's value returns when the lock ends. If the hook fails or never
+  fires, these choices leave locks as the game has them and say so (UE4SS.log, locks).
+  Nothing else is registered: no notifications, no repeated name searches. (A
+  2026-10-01 crash came from another mod repeating a search for a missing function at
+  every lock.)
 
 In the game
-  The module ran in the game with megamod 0.2.1 (session of 2026-10-04; the
-  hero a master of lock picking, "all" set for the master).
-  - Seen there: eleven locks were started, each with the module's number
-    (99) in place; the hero's level was told by his skill tags; the game
-    wrote its own number (2) back seven times and the module set its own
-    again. The names of chest locks are the ones in lockdata.lua (seen in a
-    session with another author's mod).
-  - Read from the game's program code and data, not seen in the game: the
-    rules of the minigame that the "safe" numbers rest on; that the pick's
-    wrong moves can be set the same way; the function hooked for "half"
-    and "safe"; the settings for an untrained and a skilled hero.
-  - Not known: what the lock screen shows for a pick that takes many more
-    wrong moves than the game's 2 to 6.
-  If the tags cannot be asked, the module tells the level by the numbers the
-  game itself set and no longer notices a lock in progress (no note, and a
-  changed setting does not wait for the lock's end); with "half" and "safe"
-  it then leaves every lock as the game has it. "half" and "safe" also
-  leave every lock as the game has it while the tags answer but do not show
-  the hero's skill level (the module says so once): tags like that are not
-  relied on to tell when a lock is over. If a number cannot be written, it
-  is left as it was and the module says so once.
-  The megamod's Scripts\diagnostics\ folder records what the module saw:
-  how the level was told, whether its numbers were in place when a lock
-  started, whether the hook ran, and what the hero's values held after a
-  load.
+  Ran with megamod 0.2.1 (2026-10-04; master lock picker, "all" for master).
+  - Seen: 11 locks started, each with the module's value (99) set; level read from skill
+    tags; the game wrote its value (2) back 7 times and the module re-set it. Chest lock
+    names match lockdata.lua (seen in a session with another author's mod).
+  - Read from the game's code and data, not seen in the game: the minigame rules behind
+    "safe"; setting wrong moves the same way; the hooked function for "half"/"safe";
+    untrained and skilled settings.
+  - Unknown: what the lock screen shows for picks with far more than 2 to 6 wrong moves.
+  If tags cannot be read, the level is inferred from the game's values and locks in
+  progress are not detected (no note; changes do not wait for the lock to end);
+  "half"/"safe" then leave every lock as the game has it. They also do so when tags
+  answer but show no skill level (logged once). Unwritable values are left and logged
+  once.
+  Diagnostics (Scripts\diagnostics\): how the level was read, whether values were set at
+  lock start, whether the hook ran, hero values after a load.

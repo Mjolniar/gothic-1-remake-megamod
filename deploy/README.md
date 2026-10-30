@@ -1,22 +1,23 @@
 # deploy
 
-The installer, its independent audit and their rehearsal, as used on the PC the mod was made for (Windows Python).
+> AI-generated.
 
-| File | What it does |
+Installer, independent audit and rehearsal for the author's PC (Windows Python).
+
+| File | Function |
 |---|---|
-| `install_megamod.py` | installs or updates G1R_MegaMod from a `-dev` package (and the settings app); retires the mods of other authors whose jobs a module took over and carries their settings over; keeps every replaced file in a backup folder with a rollback script; refuses while the game runs |
-| `audit_megamod.py` | checks the PC afterwards without the installer's logic: Mods folder, saves (hashes), UE4SS.dll, the settings app, the desktop shortcut; last line `AUDIT OK` |
-| `sim_megamod.py` | builds a mock of the PC below a temp folder and runs installer, rollback and audit against it; with `--pc-mods` / `--pc-backup` a rehearsal on copies of the real folders |
+| `install_megamod.py` | Installs/updates G1R_MegaMod and the settings app from a `-dev` package. Retires other authors' mods a module replaced and migrates their settings. Backs up every replaced file with a rollback script. Refuses while the game runs. |
+| `audit_megamod.py` | Checks the PC independently of the installer: Mods folder, save hashes, UE4SS.dll, settings app, desktop shortcut. Last line `AUDIT OK`. |
+| `sim_megamod.py` | Builds a mock PC in a temp folder and runs installer, rollback and audit against it. `--pc-mods` / `--pc-backup`: rehearsal on copies of the real folders. |
 
-The PC's places are in `deploy_settings.json` next to the scripts (not in the repository); copy
-`deploy_settings.example.json` and fill it in:
+Paths go in `deploy_settings.json` next to the scripts (not in the repository). Copy `deploy_settings.example.json`:
 
-| Key | What |
+| Key | Value |
 |---|---|
-| `game` | the Gothic 1 Remake folder (the one with `G1R` in it) |
-| `saves` | the game's save folder (`...\AppData\Local\G1R\Saved\SaveGames`) |
-| `project` | the work folder: `megamod\` with the packages, and where the backup folders go |
-| `shortcut` | the desktop shortcut of the settings app |
+| `game` | Gothic 1 Remake folder (contains `G1R`) |
+| `saves` | Save folder (`...\AppData\Local\G1R\Saved\SaveGames`) |
+| `project` | Work folder: `megamod\` with packages; backup folders go here |
+| `shortcut` | Settings app desktop shortcut |
 
-`python install_megamod.py --check` shows the plan and changes nothing; the run without `--check` follows only with
-the game closed, then `python audit_megamod.py`.
+`python install_megamod.py --check` shows the plan without changes. Run without `--check` only with the game closed, then
+`python audit_megamod.py`.

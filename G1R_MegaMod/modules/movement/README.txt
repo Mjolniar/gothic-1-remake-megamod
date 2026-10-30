@@ -1,59 +1,44 @@
-Module "movement" - how fast you walk, run and swim, and your scavenger runs (G1R_MegaMod)
-==========================================================================================
+Module "movement" - walk, run, swim and scavenger speed (G1R_MegaMod)
+=====================================================================
+AI-generated. Bugs: see G1R_MegaMod\README.txt.
 
-What it does
-  * Hero on foot: the hero's own speed factor (his movement
-    attribute SpeedModifier; the game's character definition gives him
-    1.00, its tiredness lowers it by a few percent on top) times the
-    multiplier: walking, running, sneaking.
-  * Swimming: the game's three swimming speeds of the hero (slow,
-    normal, fast: 100, 150 and 220) times the multiplier. The game keeps
-    them in a table of its own (the default object of the script class
-    LocomotionSpeedSettings_Swim_Laying_Player); the module multiplies that
-    table.
-  * Your scavenger: the scavenger's own speed factor (its movement
-    attribute SpeedModifier, 1.00; the game's own tiredness moves such a
-    factor by a few percent) times the multiplier. It counts whenever the
-    scavenger runs: with you on its back, and when it follows you. The
-    scavenger is found through the game's own lookup by name, as the module
-    "mount" finds it - no search among all objects.
-  * 1.00 leaves the game as it is. Going back to 1.00, or switching the
-    module off, puts the game's own values back.
-  * The game's own factor of the hero and of the scavenger is the 1.00 of
-    their character definitions; the module sets 1.00 times the multiplier.
-    New attributes - the scavenger summoned, a save loaded - are set to
-    that, never multiplied again (version 1.0.0 did: the scavenger got
-    faster with every summon).
-  * A value somebody else set in the meantime (another mod, or the game
-    itself) is left alone - said once in UE4SS.log - until the next change
-    of the setting or new attributes.
-  * Nothing is written into your save games.
-  * Console: movement (status), movement reload (read config.lua now).
+Function
+  * Hero on foot: the hero's speed factor (movement attribute SpeedModifier; 1.00 from
+    his character definition, lowered a few % by tiredness) x multiplier: walk, run,
+    sneak.
+  * Swimming: the hero's three swim speeds (slow, normal, fast: 100, 150, 220) x
+    multiplier, in the default object of LocomotionSpeedSettings_Swim_Laying_Player.
+  * Scavenger: its speed factor (SpeedModifier, 1.00; tiredness moves it a few %) x
+    multiplier, ridden or following. Found by the game's name lookup (as in "mount"), no
+    search of all objects.
+  * 1.00 = game. Back to 1.00 or module off restores game values.
+  * The factor set is always 1.00 x multiplier (the definition's 1.00). New attributes
+    (summon, loaded save) get that value, never multiplied again (1.0.0 compounded it on
+    every summon).
+  * A value changed by someone else (another mod, the game) is left alone - logged once -
+    until the next setting change or new attributes.
+  * Nothing saved.
+  * Console: movement (status), movement reload (re-read config.lua).
 
 Seen in the game (1.0.0 and 1.1.0, 2026-10-06)
-  The swimming table and the scavenger's factor found and written; the
-  player saw the scavenger faster (too fast after several summons: fixed
-  in 1.1.0). 1.1.0 found the scavenger's factor at 1.00 and set 1.30 once
-  (MountSpeed 1.30); a summon under 1.1.0 is not seen yet. The hero's own
-  factor (1.1.0) has run in the offline tests only.
+  Swim table and scavenger factor found and written; the player saw a faster scavenger
+  (too fast after several summons: fixed in 1.1.0). 1.1.0 found the factor at 1.00 and
+  set 1.30 once (MountSpeed 1.30). A summon under 1.1.0 not seen yet. Hero factor (1.1.0):
+  offline tests only.
 
-Not tested in the game yet
-  Whether the game uses changed swimming speeds and a changed speed factor
-  at once, or only for a hero or scavenger made after the change (for
-  example after loading a save). If a setting seems to do nothing, load the
-  save again; if it still does nothing, send UE4SS.log and the folder
-  Scripts/diagnostics of G1R_MegaMod.
+Not tested in the game
+  Whether changed swim speeds and factors apply at once or only to a hero/scavenger
+  created later (e.g. after loading). If a setting seems to do nothing, reload the save;
+  if still nothing, send UE4SS.log and G1R_MegaMod's Scripts/diagnostics.
 
-What it costs
-  Nothing while every multiplier is 1.00. Otherwise one look every two
-  seconds: the hero's factor, the swimming table (three values) and the
-  scavenger's factor.
+Cost
+  None at 1.00. Otherwise one check every 2 s: hero factor, swim table (3 values),
+  scavenger factor.
 
-Settings: Scripts/config.lua (the settings app, page "Hero > Movement", or the
-  in-game mod menu, page "Movement", change them while the game runs)
-  Enabled        the whole module (true)
-  HeroSpeed      speed of the hero on foot, times (1.00; 0.50 - 3.00)
-  SwimSpeed      swimming speed, times (1.00; 0.50 - 3.00)
-  MountSpeed     speed of your scavenger, times (1.00; 0.50 - 3.00)
-  LogChanges     a line in UE4SS.log for every speed changed or put back (false)
-  The multipliers are not part of the five presets of the settings app.
+Settings: Scripts/config.lua (app page "Hero > Movement"; in-game menu "Movement"; live)
+  Enabled        module on (true)
+  HeroSpeed      hero on foot, times (1.00; 0.50 - 3.00)
+  SwimSpeed      swimming, times (1.00; 0.50 - 3.00)
+  MountSpeed     scavenger, times (1.00; 0.50 - 3.00)
+  LogChanges     UE4SS.log line per change or restore (false)
+  Not part of the settings app presets.

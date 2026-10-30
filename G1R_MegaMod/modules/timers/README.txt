@@ -1,48 +1,41 @@
-Module "timers" - how long what is on you still lasts (G1R_MegaMod)
-====================================================================
+Module "timers" - remaining effect times (G1R_MegaMod)
+======================================================
+AI-generated. Bugs: see G1R_MegaMod\README.txt.
 
-What it does
-  A small box lists what is on you and how long it still lasts, for
-  example "Burning 7 s", "Healing 1:12", "Light 4:32", "Alcohol 1:00":
+Function
+  A small box lists active effects and time left, e.g. "Burning 7 s", "Healing 1:12",
+  "Light 4:32", "Alcohol 1:00":
   * healing and mana over time from food and potions;
   * burning, frozen, electrified, wind, slowed;
-  * knocked out, and sleep, fear or charm cast on you;
-  * the Light spell (the game's own timer of the spell; when that cannot be
-    read, the module counts itself - that count does not stand still while
-    you talk, the game's does);
-  * alcohol and swampweed: how long until they have worn off (the level and
-    the rate it falls by);
-  * if you want, every other effect of the game that lasts a while, by the
-    game's own name for it.
-  The box is only there while something is on you. It is read twice a
-  second; nothing is written into the game.
-  Console: timers (status), timers reload (read config.lua now).
+  * knocked out; sleep, fear or charm on you;
+  * Light spell (game's own spell timer; if unreadable, the module counts itself - that
+    count keeps running during conversations, the game's does not);
+  * alcohol and swampweed: time until worn off (from level and decay rate);
+  * optionally every other timed effect, by the game's own name.
+  Shown only while something is active. Read twice a second; nothing written.
+  Console: timers (status), timers reload (re-read config.lua).
 
 Seen in the game (0.3.0 and 0.3.2, 2026-10-06)
-  The list of effects read from the hero's ability system, with the time
-  left; the Light's time from the engine's timer of the spell. Two effects
-  were shown under the wrong name (a spell's mana cost as "Burning", the
-  counter of hits as "Frozen"): left out since 1.0.1 and 1.0.2.
+  Effect list read from the hero's ability system with time left; Light time from the
+  engine's spell timer. Two effects had wrong names (spell mana cost as "Burning", hit
+  counter as "Frozen"): excluded since 1.0.1 and 1.0.2.
 
-Not tested in the game yet
-  The countdowns of alcohol and swampweed after a drink, and the kinds
-  nobody has had on him in a logged session. If the box stays empty while you burn or drink, send UE4SS.log
-  and the folder Scripts/diagnostics of G1R_MegaMod (the notes timers.* say
-  which part did not answer).
+Not tested in the game
+  Alcohol and swampweed countdowns after a drink; effect kinds nobody has had in a logged
+  session. If the box stays empty while burning or drinking, send UE4SS.log and
+  G1R_MegaMod's Scripts/diagnostics (notes timers.* show which part failed).
 
-Settings: Scripts/config.lua (the settings app, page "Interface > Effect
-  timers", or the in-game mod menu, page "Effect timers")
-  Enabled        the whole module (true)
+Settings: Scripts/config.lua (app page "Interface > Effect timers"; in-game menu "Effect
+timers")
+  Enabled        module on (true)
   ShowFood       healing and mana over time (true)
   ShowElements   burning, frozen, electrified, wind, slowed (true)
   ShowMind       knocked out, asleep, afraid, charmed (true)
-  ShowLight      the Light spell (true)
+  ShowLight      Light spell (true)
   ShowDrinks     alcohol and swampweed (true)
-  ShowOthers     every other effect that lasts a while (false)
-  Position       the corner of the box: "bottom left" (default), "top left",
-                 "bottom right", "top right"
-  DistanceX      how far from the side, in the screen's units (24)
-  DistanceY      how far from the top or bottom (200) - move it up or down
-                 to stand above the health bar
-  The letters are the ones set on the page "Notes on screen" (module
-  general: gothic, book or plain).
+  ShowOthers     every other timed effect (false)
+  Position       box corner: "bottom left" (default), "top left", "bottom right",
+                 "top right"
+  DistanceX      distance from the side, screen units (24)
+  DistanceY      distance from top or bottom (200) - adjust to sit above the health bar
+  Font: page "Notes on screen" (module general: gothic, book, plain).
