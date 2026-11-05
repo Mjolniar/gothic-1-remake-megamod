@@ -10,3 +10,4 @@ app/filetests/obj/
 G1R_MegaMod/dev/out/
 __pycache__/
 *.pyc
+modkit/G1R_MegaMod/Script/G1R_MegaMod/Repopulate/MegaRegrowth.as

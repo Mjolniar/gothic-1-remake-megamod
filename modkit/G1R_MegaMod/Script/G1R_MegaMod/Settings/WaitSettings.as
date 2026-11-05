@@ -25,7 +25,7 @@ class UMegaSettings_Wait : UGothicModExt_UserSettings
 
 	// ---- Short wait ----
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt ShortKey = FModUserSettingsInt(
 		Value = 0,
@@ -44,7 +44,7 @@ class UMegaSettings_Wait : UGothicModExt_UserSettings
 
 	// ---- Long wait ----
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt LongKey = FModUserSettingsInt(
 		Value = 0,
@@ -63,7 +63,7 @@ class UMegaSettings_Wait : UGothicModExt_UserSettings
 
 	// ---- Wait until morning ----
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt MorningKey = FModUserSettingsInt(
 		Value = 0,
@@ -82,7 +82,7 @@ class UMegaSettings_Wait : UGothicModExt_UserSettings
 
 	// ---- Wait until evening ----
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt EveningKey = FModUserSettingsInt(
 		Value = 0,

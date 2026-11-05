@@ -3,6 +3,7 @@
     python install_modkit.py --check                 what would be done, nothing written
     python install_modkit.py                         install (game closed)
     python install_modkit.py --disable-ue4ss         also move UE4SS's loader DLL out of the game folder
+    python install_modkit.py --scavenger-name "Name" also give the rideable scavenger that name (a text override)
     python install_modkit.py --rollback <backup>     put a backup folder of this script back
 
 Windows Python. The places come from deploy_settings.json next to this script ("game", "project").
@@ -12,6 +13,11 @@ Windows Python. The places come from deploy_settings.json next to this script ("
 - --disable-ue4ss: since the game's 1.1 hotfix the game exits when UE4SS is loaded. The loader DLL next to the game's
   executable (the one that loads ue4ss/UE4SS.dll: dwmapi.dll, else another known proxy name) is moved into the same
   backup folder. The ue4ss folder itself stays as it is (UE4SS.dll keeps its hash).
+- --scavenger-name: the game names a character from its text table by its unique name (mount facts M9); the package
+  gets a text override for Scavenger_Adult_Rideable (Config/Game.ini mount point + Story/Names/text/*.textdb.yaml, the
+  ModKit's localization override). Without it the scavenger keeps the game's name.
+- Herb regrowth needs Script/G1R_MegaMod/Repopulate/MegaRegrowth.as, made by modkit/tools/gen_regrowth.py from a
+  clone of the official ModKit; without it the install goes on and says so.
 - Saves are not touched; copy them yourself before the first load on a new game version.
 """
 import argparse
@@ -62,11 +68,29 @@ def files_of(root):
     return out
 
 
+LANGUAGES = ("english", "german", "french", "spanish", "russian")
+
+
+def write_name(target, name):
+    """The text override that names the rideable scavenger (ModKit example Example-LocalizationOverride)."""
+    os.makedirs(os.path.join(target, "Config"), exist_ok=True)
+    with open(os.path.join(target, "Config", "Game.ini"), "w", encoding="utf-8", newline="\r\n") as f:
+        f.write("[/Script/AlkimiaStoryFileImport.AlkimiaLocalizationSubsystem]\n")
+        f.write('+MountPoints=(MountPoint="/G1R_MegaMod", Module="G1R_MegaMod", MountPath="/Story/Names")\n')
+    folder = os.path.join(target, "Story", "Names", "text")
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, "megamod_names.textdb.yaml"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("Scavenger_Adult_Rideable:\n")
+        for lang in LANGUAGES:
+            f.write('  %s: "%s"\n' % (lang, name))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--disable-ue4ss", action="store_true")
     ap.add_argument("--rollback")
+    ap.add_argument("--scavenger-name")
     a = ap.parse_args()
     try:
         with open(os.path.join(HERE, "deploy_settings.json"), encoding="utf-8") as f:
@@ -119,11 +143,19 @@ def main():
             if os.path.isfile(os.path.join(win64, p)):
                 loader = p
                 break
+    regrowth = os.path.join(SOURCE, "Script", "G1R_MegaMod", "Repopulate", "MegaRegrowth.as")
+    if not os.path.isfile(regrowth):
+        print("NOTE: no MegaRegrowth.as (run modkit/tools/gen_regrowth.py <G1R-Modkit/Script> first): herbs and items regrow as the game has it")
+    name = (a.scavenger_name or "").strip()
+    if any(c in name for c in '"\\\r\n') or len(name) > 40:
+        refuse("the scavenger's name must be at most 40 letters, without quotes, backslashes or line breaks.")
     new = files_of(SOURCE)
     old = files_of(target) if os.path.isdir(target) else {}
     print("package: %s (%d files)" % (SOURCE, len(new)))
     print("into:    %s (%s)" % (target, "replaces %d files" % len(old) if old else "new"))
     print("backup:  %s" % backup)
+    if name:
+        print("scavenger: named \"%s\" (text override)" % name)
     if a.disable_ue4ss:
         print("UE4SS loader: %s" % ("moves to the backup: " + os.path.join(win64, loader) if loader else "none of %s found next to the game: nothing to move" % ", ".join(PROXIES)))
     if a.check:
@@ -140,6 +172,8 @@ def main():
         shutil.move(os.path.join(win64, loader), os.path.join(backup, "Win64", loader))
     if files_of(target) != new:
         refuse("the installed files differ from the package (copy failed); the backup is " + backup + ".")
+    if name:
+        write_name(target, name)
     with open(os.path.join(backup, "README.txt"), "w", encoding="utf-8") as f:
         f.write("Backup of install_modkit.py, %s.\nRollback: python install_modkit.py --rollback \"%s\"\n" % (stamp, backup))
     print("INSTALLED: %d files; backup %s" % (len(new), backup))

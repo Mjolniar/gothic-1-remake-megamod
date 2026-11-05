@@ -37,7 +37,7 @@ class UMegaSettings_Mount : UGothicModExt_UserSettings
 		MinValue = 4,
 		MaxValue = 20);
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt FixKey = FModUserSettingsInt(
 		Value = 0,

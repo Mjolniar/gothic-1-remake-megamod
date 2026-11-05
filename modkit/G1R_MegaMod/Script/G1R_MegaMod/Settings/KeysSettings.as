@@ -14,11 +14,11 @@ class UMegaSettings_Keys : UGothicModExt_UserSettings
 		DefaultValue = true,
 		DisplayText = FText::FromString("List of keys"));
 
-	// a key number of Keys.as (0 = no key)
+	// a key number (Core/MegaCore.as KeyOf; 0 = no key)
 	UPROPERTY(Config)
 	FModUserSettingsInt ListKey = FModUserSettingsInt(
-		Value = 0,
-		DefaultValue = 0,
+		Value = 39,
+		DefaultValue = 39,
 		DisplayText = FText::FromString("Key that shows or hides the list (key number, 0 = none)"),
 		MinValue = 0,
 		MaxValue = 58);
