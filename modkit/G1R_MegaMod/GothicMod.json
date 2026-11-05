@@ -1,0 +1,9 @@
+{
+	"name": "G1R_MegaMod",
+	"title": "MegaMod (unofficial)",
+	"author": "MegaMod contributors (written by AI)",
+	"description": "Respawns, map pins, regeneration, magic and lock picking balance, mining, experience multiplier, waiting, scavenger fixes, movement speeds, effect timers. Settings: Options, Game, MegaMod sections. This is an unofficial modification. It is not made, endorsed or supported by THQ Nordic.",
+	"projectWebsiteURL": "https://github.com/Mjolniar/gothic-1-remake-megamod",
+	"modVersion": "0.4.0",
+	"loadOrder": "normal"
+}
