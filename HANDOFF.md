@@ -12,6 +12,11 @@ scavenger's own name; 0.3.4: no "Frozen" on every hit) and settings app 2.1.1, b
 data - is on that PC only, not here. The deploy scripts read the PC's places from `deploy/deploy_settings.json` (not
 committed). From now on this repository is the source; `<h>\mega` on the PC is the state of 0.3.4.
 
+- **BLOCKER 2026-11-05: the game's 1.1 hotfix refuses UE4SS.** At start: "Potentially malicious code injection found,
+  game will exit now. If you want to mod the game please use the provided API. - <game>\G1R\Binaries\Win64\ue4ss\
+  UE4SS.dll". No UE4SS mod can run (the megamod, HUDMap, SharedModMenu, PLuaModLoader, the native ones). Evading the
+  check is not done (the developer asks for its API). P8: the player's decision - play without UE4SS now (the loader
+  moved aside, backup kept) and/or a port of the modules to the official ModKit. 0.3.6 is not installed.
 - The game got its Feature Update 1 on 2026-10-29, with the official ModKit (the game's scripts, public): P7. In the
   cloud: the mod's data and names checked against it, 0.3.6 made (committed, not installed; it contains 0.3.5).
 - Next, local session: P7 steps 1-4 on the PC, then release 0.3.6 + app 2.1.2 (section 3).
@@ -451,6 +456,18 @@ Later, the player's decision: official mod packages instead of UE4SS Lua (resear
 ModKit (scripts and reference) is unchanged since 2026-10-29, so a 1.1 hotfix after it changed no published script;
 0.3.6 rechecked - suite 27 / 7478, `modkit_check.py` TABLES MATCH THE GAME, `build_release.py --check` OK. No PC folder
 was reachable from the cloud: the install of 0.3.6 + app 2.1.2 (section 3, P7 steps 1-4) waits for a local session.
+
+### P8 - the game refuses UE4SS (1.1 hotfix, 2026-11-05) - waits for the player's decision
+1. To play now (local session, game closed, backup first): move the UE4SS proxy DLL next to the game's executable
+   (`<game>\G1R\Binaries\Win64\`, the one that loads `ue4ss\UE4SS.dll`; dwmapi.dll in UE4SS 3.x) into a backup
+   folder; leave `ue4ss\` as it is (UE4SS.dll keeps its hash). The game then starts without any UE4SS mod. Saves keep
+   what the modules wrote into the game while they ran (the scavenger's speed factor, lock pick numbers: facts MV5,
+   L-rows); nothing else of the mod is in a save.
+2. A port to the ModKit (official mod packages: AngelScript, `G1R/Mods/<name>/GothicMod.json`, script patches,
+   inheritance injection, settings in the game's own options): module by module, the simple data ones first (mining,
+   magic, xp, locks, movement, intro), the timed ones next (regen, wait, mount, repopulate), the UI ones last (map pins,
+   effect timers, key list, notes). It cannot be compiled or tested in the cloud (the scripts compile only in the
+   game, `-as-development-mode`); every step needs the player's sessions. research/feature-update-1.md, last part.
 
 ## 5. Open questions for the player (asked once; do not ask again, act on the answer when it comes)
 

@@ -1,5 +1,11 @@
 # Gothic 1 Remake MegaMod
 
+> [!CAUTION]
+> **Does not run on the current game.** Since the game's 1.1 hotfix (November 2026) Gothic 1 Remake refuses injected
+> code at start ("Potentially malicious code injection found ... please use the provided API") and names UE4SS.dll:
+> every UE4SS mod, this one included, stops the game. The game's official mod system (the
+> [ModKit](https://github.com/AlkimiaInteractive/G1R-Modkit)) is the way forward; a port is not done yet.
+
 > [!WARNING]
 > **AI-generated.** Mod, settings app and tools written by AI. Tested offline and in a few play sessions. Expect bugs.
 > Report them as [issues](https://github.com/Mjolniar/gothic-1-remake-megamod/issues) with `UE4SS.log` and
