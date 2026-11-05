@@ -4,7 +4,8 @@
 > **Does not run on the current game.** Since the game's 1.1 hotfix (November 2026) Gothic 1 Remake refuses injected
 > code at start ("Potentially malicious code injection found ... please use the provided API") and names UE4SS.dll:
 > every UE4SS mod, this one included, stops the game. The game's official mod system (the
-> [ModKit](https://github.com/AlkimiaInteractive/G1R-Modkit)) is the way forward; a port is not done yet.
+> [ModKit](https://github.com/AlkimiaInteractive/G1R-Modkit)) is the way forward: the port is in
+> [`modkit/`](modkit/README.md) (0.4.0, written, not compiled or tested in the game yet).
 
 > [!WARNING]
 > **AI-generated.** Mod, settings app and tools written by AI. Tested offline and in a few play sessions. Expect bugs.

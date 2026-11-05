@@ -4,7 +4,7 @@
 UCLASS(Config=GameUserSettings)
 class UMegaSettings_Magic : UGothicModExt_UserSettings
 {
-	default CategoryName = FText::FromString("MegaMod: Combat");
+	default CategoryName = FText::FromString("MegaMod: Magic");
 
 	// ---- Magic: all spells ----
 

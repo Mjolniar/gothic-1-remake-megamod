@@ -4,7 +4,7 @@
 UCLASS(Config=GameUserSettings)
 class UMegaSettings_Melee : UGothicModExt_UserSettings
 {
-	default CategoryName = FText::FromString("MegaMod: Combat");
+	default CategoryName = FText::FromString("MegaMod: Melee");
 
 	// ---- Melee: clean-ups ----
 

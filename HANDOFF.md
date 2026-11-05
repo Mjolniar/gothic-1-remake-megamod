@@ -1,4 +1,4 @@
-# G1R_MegaMod - handoff, 2026-10-30 (cloud)
+# G1R_MegaMod - handoff, 2026-11-05 (cloud)
 
 Rules and commands: `CLAUDE.md` (read it first). This file: what the project is, where it stands, the next step, the
 queue. Keep it current: when a step is done, change its line here (one line). `mega\PLAN-NEXT.md` and `mega\PLAN.md`
@@ -15,8 +15,9 @@ committed). From now on this repository is the source; `<h>\mega` on the PC is t
 - **BLOCKER 2026-11-05: the game's 1.1 hotfix refuses UE4SS.** At start: "Potentially malicious code injection found,
   game will exit now. If you want to mod the game please use the provided API. - <game>\G1R\Binaries\Win64\ue4ss\
   UE4SS.dll". No UE4SS mod can run (the megamod, HUDMap, SharedModMenu, PLuaModLoader, the native ones). Evading the
-  check is not done (the developer asks for its API). P8: the player's decision - play without UE4SS now (the loader
-  moved aside, backup kept) and/or a port of the modules to the official ModKit. 0.3.6 is not installed.
+  check is not done (the developer asks for its API). The player chose (2026-11-05, "Do all please."): the port of
+  the modules to the official ModKit. Written in the cloud the same day: `modkit/` (megamod 0.4.0, not compiled yet;
+  `modkit/README.md`), installer `deploy/install_modkit.py`. Next: P8 on the PC. 0.3.6 is not installed (it cannot run).
 - The game got its Feature Update 1 on 2026-10-29, with the official ModKit (the game's scripts, public): P7. In the
   cloud: the mod's data and names checked against it, 0.3.6 made (committed, not installed; it contains 0.3.5).
 - Next, local session: P7 steps 1-4 on the PC, then release 0.3.6 + app 2.1.2 (section 3).
@@ -85,6 +86,9 @@ committed). From now on this repository is the source; `<h>\mega` on the PC is t
   2.0.0 (2026-10-05, P1) is in `megamod-install-backup-20261006-083421\replaced\`.
 
 ## 3. Next step
+
+**Local session: P8 - install the ModKit package 0.4.0 and the first start with compile errors shown.** The UE4SS
+release below (0.3.6) waits: the game exits when UE4SS is loaded.
 
 **Local session: the game update (P7 steps 1-4), then release megamod 0.3.6 + settings app 2.1.2.** 0.3.6 = 0.3.5
 (P5: shorter settings texts) + the changes for Feature Update 1 (P7: magic 1.0.2, repopulate 1.5.1, melee 1.0.1,
@@ -457,17 +461,26 @@ ModKit (scripts and reference) is unchanged since 2026-10-29, so a 1.1 hotfix af
 0.3.6 rechecked - suite 27 / 7478, `modkit_check.py` TABLES MATCH THE GAME, `build_release.py --check` OK. No PC folder
 was reachable from the cloud: the install of 0.3.6 + app 2.1.2 (section 3, P7 steps 1-4) waits for a local session.
 
-### P8 - the game refuses UE4SS (1.1 hotfix, 2026-11-05) - waits for the player's decision
-1. To play now (local session, game closed, backup first): move the UE4SS proxy DLL next to the game's executable
-   (`<game>\G1R\Binaries\Win64\`, the one that loads `ue4ss\UE4SS.dll`; dwmapi.dll in UE4SS 3.x) into a backup
-   folder; leave `ue4ss\` as it is (UE4SS.dll keeps its hash). The game then starts without any UE4SS mod. Saves keep
-   what the modules wrote into the game while they ran (the scavenger's speed factor, lock pick numbers: facts MV5,
-   L-rows); nothing else of the mod is in a save.
-2. A port to the ModKit (official mod packages: AngelScript, `G1R/Mods/<name>/GothicMod.json`, script patches,
-   inheritance injection, settings in the game's own options): module by module, the simple data ones first (mining,
-   magic, xp, locks, movement, intro), the timed ones next (regen, wait, mount, repopulate), the UI ones last (map pins,
-   effect timers, key list, notes). It cannot be compiled or tested in the cloud (the scripts compile only in the
-   game, `-as-development-mode`); every step needs the player's sessions. research/feature-update-1.md, last part.
+### P8 - the game refuses UE4SS (1.1 hotfix, 2026-11-05) - the ModKit port (the player: "Do all please.")
+Written in the cloud 2026-11-05: `modkit/G1R_MegaMod` (0.4.0; what is ported and what not: `modkit/README.md`). Steps
+on the PC, one at a time:
+1. Game closed (`Get-Process G1R*`). Saves: hash list first (`audit_megamod.py` way), copies kept.
+2. `git clone https://github.com/AlkimiaInteractive/G1R-Modkit` (any folder), then
+   `python modkit/tools/gen_regrowth.py <clone>/Script` (writes `Repopulate/MegaRegrowth.as`, not committed: it holds
+   the game's item lists).
+3. `python deploy/install_modkit.py --check`, then `python deploy/install_modkit.py --disable-ue4ss
+   --scavenger-name "<the name in his mount config.lua>"` (moves dwmapi.dll into the backup; `ue4ss\` stays with its
+   hash; the UE4SS mod folder `ue4ss\Mods\G1R_MegaMod` stays as it is).
+4. The player starts the game himself with `-as-development-mode` (Steam launch options) and sends the compile errors
+   (log `%LOCALAPPDATA%\G1R\Saved\Logs`). Fix in the cloud or locally; repeat until it compiles. Name checker:
+   `python modkit/tools/check_as.py <clone>/Script <reference>`.
+5. Once it compiles: his values in Options, read from his `config.lua` files (CLAUDE.md: 10x XP = Experience /
+   Multiplier 10; Wait on Y = Time / ShortKey 25, ShortMinutes 30; keys without a number, e.g. OEM_SIX, need another
+   key). Then one session: every line `[MegaMod <module>]` in the game's log is evidence; facts files get IN-GAME rows.
+6. Not ported (decide after step 5): repopulate creatures and chests, map pins (pictures need cooked content), the
+   items listed as "Not ported" in `modkit/README.md`.
+7. License (ModKit LICENSE.txt 3.8): no new decompiling / disassembling of the game; facts come from the ModKit's
+   scripts and reference from now on.
 
 ## 5. Open questions for the player (asked once; do not ask again, act on the answer when it comes)
 

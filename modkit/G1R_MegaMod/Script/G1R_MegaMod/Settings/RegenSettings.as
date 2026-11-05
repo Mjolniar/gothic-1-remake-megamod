@@ -4,7 +4,7 @@
 UCLASS(Config=GameUserSettings)
 class UMegaSettings_Regen : UGothicModExt_UserSettings
 {
-	default CategoryName = FText::FromString("MegaMod: Combat");
+	default CategoryName = FText::FromString("MegaMod: Regeneration");
 
 	// ---- Mana regeneration ----
 

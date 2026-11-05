@@ -57,7 +57,9 @@ w("")
 w("UCLASS(Config=GameUserSettings)")
 w("class " .. CLASS .. " : UGothicModExt_UserSettings")
 w("{")
-w("\tdefault CategoryName = FText::FromString(" .. str("MegaMod: " .. tostring(schema.Page or module)) .. ");")
+-- one page of the game's options per module; modules that share a page of the settings app get their own name
+local PAGE = { magic = "Magic", melee = "Melee", regen = "Regeneration" }
+w("\tdefault CategoryName = FText::FromString(" .. str("MegaMod: " .. tostring(PAGE[module] or schema.Page or module)) .. ");")
 for _, group in ipairs(schema.Groups) do
     local first = true
     for _, item in ipairs(group.Items) do
