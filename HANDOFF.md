@@ -447,6 +447,10 @@ Steps on the PC (a local session; never start the game - the player does):
    lines (profile; "read through GetCurrentProfileId"?), `markers.*`, `mount.*`, `timers.*`. Then the facts
    (P3). If the game does not start with UE4SS, tell the player at once; nothing of the megamod can run then.
 Later, the player's decision: official mod packages instead of UE4SS Lua (research/feature-update-1.md, last part).
+2026-11-05 (cloud, the player: "check over the most recent update, the version 1.1 update ... then install it"): the
+ModKit (scripts and reference) is unchanged since 2026-10-29, so a 1.1 hotfix after it changed no published script;
+0.3.6 rechecked - suite 27 / 7478, `modkit_check.py` TABLES MATCH THE GAME, `build_release.py --check` OK. No PC folder
+was reachable from the cloud: the install of 0.3.6 + app 2.1.2 (section 3, P7 steps 1-4) waits for a local session.
 
 ## 5. Open questions for the player (asked once; do not ask again, act on the answer when it comes)
 
